@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioCode Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--surface3:#1e2d45;--accent:#00d4aa;--accent2:#3b82f6;--accent3:#a78bfa;--warn:#f59e0b;--danger:#ef4444;--success:#10b981;--text:#e2e8f0;--text-dim:#64748b;--text-mid:#94a3b8;--border:#1e3a5f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse 60% 40% at 20% 20%,rgba(0,212,170,.06) 0%,transparent 60%),radial-gradient(ellipse 40% 60% at 80% 80%,rgba(59,130,246,.06) 0%,transparent 60%);pointer-events:none;z-index:0}
+header{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,14,26,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:800}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo span{color:var(--accent)}
+nav{display:flex;gap:3px}
+.nav-btn{padding:6px 14px;border-radius:8px;background:transparent;border:none;color:var(--text-mid);font-family:'Syne',sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.nav-btn:hover{color:var(--text);background:var(--surface2)}
+.nav-btn.active{color:var(--accent);background:rgba(0,212,170,.1)}
+.xp-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:.82rem;font-weight:600}
+.xp-dot{width:8px;height:8px;background:var(--warn);border-radius:50%}
+main{padding-top:60px;min-height:100vh;position:relative;z-index:1}
+.page{display:none}
+.page.active{display:flex;flex-direction:column}
+#page-home{padding:50px 40px;align-items:center}
+.hero{text-align:center;max-width:700px;margin:0 auto 50px}
+.hero-badge{display:inline-block;background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.3);color:var(--accent);padding:4px 16px;border-radius:20px;font-size:.78rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px}
+.hero h1{font-size:3rem;font-weight:800;line-height:1.1;margin-bottom:18px;background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--text-mid);font-size:1rem;line-height:1.7;max-width:540px;margin:0 auto 30px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{padding:11px 26px;background:linear-gradient(135deg,var(--accent),#00a886);border:none;border-radius:10px;color:#0a0e1a;font-family:'Syne',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 0 20px rgba(0,212,170,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 4px 30px rgba(0,212,170,.4)}
+.btn-secondary{padding:11px 26px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Syne',sans-serif;font-size:.92rem;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.stats-row{display:flex;gap:18px;justify-content:center;margin-bottom:50px;flex-wrap:wrap}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px 28px;text-align:center;min-width:120px}
+.stat-card .num{font-size:2rem;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.stat-card .label{font-size:.74rem;color:var(--text-mid);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.section-title{font-size:1.3rem;font-weight:700;margin-bottom:22px}
+.section-title span{color:var(--accent)}
+.topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;width:100%;max-width:980px}
+.topic-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.topic-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tc,var(--accent));opacity:0;transition:opacity .25s}
+.topic-card:hover{transform:translateY(-3px)}
+.topic-card:hover::before{opacity:1}
+.topic-icon{font-size:1.8rem;margin-bottom:10px}
+.topic-name{font-size:.95rem;font-weight:700;margin-bottom:5px}
+.topic-desc{font-size:.8rem;color:var(--text-mid);line-height:1.5;margin-bottom:12px}
+.topic-meta{display:flex;align-items:center;justify-content:space-between}
+.topic-count{font-size:.74rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
+.diff-easy{font-size:.7rem;padding:2px 10px;border-radius:10px;font-weight:600;background:rgba(16,185,129,.15);color:var(--success)}
+.diff-medium{font-size:.7rem;padding:2px 10px;border-radius:10px;font-weight:600;background:rgba(245,158,11,.15);color:var(--warn)}
+#page-problems{flex-direction:row !important;height:calc(100vh - 60px)}
+.problems-sidebar{width:300px;min-width:260px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;overflow:hidden}
+.sidebar-header{padding:16px;border-bottom:1px solid var(--border)}
+.sidebar-header h2{font-size:.95rem;font-weight:700;margin-bottom:10px}
+.filter-tabs{display:flex;gap:5px;flex-wrap:wrap}
+.filter-tab{padding:3px 10px;border-radius:8px;font-size:.72rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--text-mid);font-family:'Syne',sans-serif;transition:all .2s}
+.filter-tab.active,.filter-tab:hover{background:rgba(0,212,170,.1);border-color:var(--accent);color:var(--accent)}
+.problem-list{flex:1;overflow-y:auto;padding:8px}
+.problem-list::-webkit-scrollbar{width:3px}
+.problem-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.problem-item{padding:12px 14px;border-radius:10px;cursor:pointer;transition:all .2s;margin-bottom:3px;border:1px solid transparent}
+.problem-item:hover{background:var(--surface2);border-color:var(--border)}
+.problem-item.selected{background:rgba(0,212,170,.08);border-color:rgba(0,212,170,.3)}
+.problem-item-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.problem-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--text-dim)}
+.problem-title{font-size:.85rem;font-weight:600;line-height:1.3}
+.problem-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.tag{font-size:.65rem;padding:1px 7px;border-radius:5px;background:var(--surface3);color:var(--text-mid);font-weight:500}
+.solved-check{width:17px;height:17px;background:rgba(16,185,129,.2);border:1px solid var(--success);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--success);flex-shrink:0}
+.ide-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.problem-header{padding:16px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+.problem-header h2{font-size:1.1rem;font-weight:700;margin-bottom:5px}
+.problem-desc{font-size:.85rem;color:var(--text-mid);line-height:1.6;max-width:700px}
+.problem-hint-static{margin-top:8px;padding:8px 12px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);border-radius:8px;font-size:.8rem;color:var(--accent2)}
+.ide-workspace{flex:1;display:flex;overflow:hidden}
+.editor-panel{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border)}
+.editor-toolbar{display:flex;align-items:center;justify-content:space-between;padding:7px 14px;background:var(--surface);border-bottom:1px solid var(--border);gap:6px;flex-wrap:wrap}
+.editor-lang{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--text-mid);font-family:'JetBrains Mono',monospace}
+.lang-dot{width:8px;height:8px;background:#3b82f6;border-radius:50%}
+.toolbar-right{display:flex;gap:6px;align-items:center}
+.run-btn{display:flex;align-items:center;gap:7px;padding:7px 18px;background:linear-gradient(135deg,var(--accent),#00a886);border:none;border-radius:8px;color:#0a0e1a;font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:all .2s}
+.run-btn:hover{transform:scale(1.03);box-shadow:0 0 16px rgba(0,212,170,.4)}
+.run-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.hint-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);border-radius:8px;color:var(--warn);font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:all .2s}
+.hint-btn:hover{background:rgba(245,158,11,.2)}
+.hint-btn:disabled{opacity:.5;cursor:not-allowed}
+.explain-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;background:rgba(167,139,250,.12);border:1px solid rgba(167,139,250,.35);border-radius:8px;color:var(--accent3);font-family:'Syne',sans-serif;font-size:.83rem;font-weight:700;cursor:pointer;transition:all .2s}
+.explain-btn:hover{background:rgba(167,139,250,.2)}
+.explain-btn:disabled{opacity:.5;cursor:not-allowed}
+.spinner{width:13px;height:13px;border:2px solid rgba(0,0,0,.3);border-top-color:#0a0e1a;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.code-editor-wrapper{flex:1;position:relative;overflow:hidden}
+.line-numbers{position:absolute;left:0;top:0;bottom:0;width:42px;background:var(--surface);border-right:1px solid var(--border);padding:14px 0;z-index:1;overflow:hidden;pointer-events:none}
+.line-num{display:block;text-align:right;padding-right:8px;font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--text-dim);line-height:1.6em;height:1.6em}
+textarea.code-input{position:absolute;top:0;left:42px;right:0;bottom:0;background:var(--bg);color:var(--text);border:none;outline:none;padding:14px;font-family:'JetBrains Mono',monospace;font-size:.86rem;line-height:1.6em;resize:none;tab-size:4;caret-color:var(--accent);white-space:pre;overflow-wrap:normal;overflow:auto}
+textarea.code-input::selection{background:rgba(0,212,170,.2)}
+.output-panel{width:370px;min-width:280px;display:flex;flex-direction:column;background:var(--surface)}
+.output-tabs{display:flex;border-bottom:1px solid var(--border)}
+.output-tab{padding:9px 14px;font-size:.76rem;font-weight:600;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;font-family:'Syne',sans-serif;background:transparent;border-top:none;border-left:none;border-right:none}
+.output-tab:hover{color:var(--text-mid)}
+.output-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.output-content{flex:1;overflow-y:auto;padding:14px;display:none}
+.output-content.visible{display:block}
+.output-content::-webkit-scrollbar{width:3px}
+.output-content::-webkit-scrollbar-thumb{background:var(--border)}
+.placeholder{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-dim);text-align:center;gap:10px}
+.placeholder .icon{font-size:2.2rem}
+.placeholder p{font-size:.83rem;line-height:1.5;max-width:190px}
+.out-block{background:var(--bg);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:.8rem;line-height:1.7;white-space:pre-wrap;word-break:break-word;margin-bottom:10px}
+.out-block.ok{border-left:3px solid var(--success);color:#6ee7b7}
+.out-block.err{border-left:3px solid var(--danger);color:#fca5a5}
+.out-block.info{border-left:3px solid var(--accent2);color:#93c5fd}
+.hint-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:14px;margin-bottom:10px;opacity:0;transform:translateY(8px);transition:all .3s}
+.hint-box.show{opacity:1;transform:translateY(0)}
+.hint-num{display:inline-block;font-size:.72rem;font-weight:700;color:var(--warn);background:rgba(245,158,11,.15);padding:2px 8px;border-radius:8px;margin-bottom:8px}
+.hint-text{font-size:.83rem;color:#fcd34d;line-height:1.6}
+.hint-code{background:var(--bg);border-radius:6px;padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:.76rem;color:var(--accent3);margin-top:8px;white-space:pre-wrap}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:all .3s}
+.modal-overlay.open{opacity:1;pointer-events:auto}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:100%;max-width:760px;max-height:88vh;display:flex;flex-direction:column;transform:translateY(20px);transition:transform .3s}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:1.1rem;font-weight:800}
+.modal-header h3 span{color:var(--accent3)}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text-mid);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--danger);color:var(--danger)}
+.modal-body{flex:1;overflow-y:auto;padding:24px}
+.modal-body::-webkit-scrollbar{width:4px}
+.modal-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+/* ── ANLATMA MODAL – rich book layout ─────────────────────────── */
+.book-section{margin-bottom:0;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.book-card{background:var(--surface2);border:1px solid var(--border);border-radius:16px;margin-bottom:18px;overflow:hidden}
+.book-card-head{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.chapter-badge{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:10px;font-size:.85rem;flex-shrink:0;font-weight:800}
+.badge-bio{background:linear-gradient(135deg,#064e3b,#065f46);color:#6ee7b7;border:1px solid #065f46}
+.badge-py{background:linear-gradient(135deg,#1e3a5f,#1e40af);color:#93c5fd;border:1px solid #1e40af}
+.badge-step{background:linear-gradient(135deg,#4c1d95,#6d28d9);color:#c4b5fd;border:1px solid #6d28d9}
+.badge-real{background:linear-gradient(135deg,#7c2d12,#92400e);color:#fcd34d;border:1px solid #92400e}
+.badge-warn{background:linear-gradient(135deg,#7f1d1d,#991b1b);color:#fca5a5;border:1px solid #991b1b}
+.chapter-title{font-size:1rem;font-weight:800;color:var(--text)}
+.chapter-tag{margin-left:auto;font-size:.68rem;padding:2px 10px;border-radius:20px;font-weight:700;letter-spacing:.5px}
+.tag-bio{background:rgba(16,185,129,.15);color:#6ee7b7}
+.tag-py{background:rgba(59,130,246,.15);color:#93c5fd}
+.tag-step{background:rgba(167,139,250,.15);color:#c4b5fd}
+.tag-real{background:rgba(245,158,11,.15);color:#fcd34d}
+.tag-warn{background:rgba(239,68,68,.15);color:#fca5a5}
+.book-card-body{padding:16px 18px}
+.book-text{font-size:.9rem;color:var(--text-mid);line-height:1.9}
+.book-text strong,.book-hl{color:var(--text);font-weight:700}
+.book-hl-green{color:#6ee7b7;font-weight:700}
+.book-hl-blue{color:#93c5fd;font-weight:700}
+.book-hl-purple{color:#c4b5fd;font-weight:700}
+.book-hl-yellow{color:#fcd34d;font-weight:700}
+.book-hl-red{color:#fca5a5;font-weight:700}
+
+/* Code block with line-by-line explanation */
+.code-explain{background:var(--bg);border:1px solid var(--border);border-radius:12px;margin:14px 0;overflow:hidden}
+.code-explain-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(167,139,250,.06)}
+.code-dot{width:10px;height:10px;border-radius:50%}
+.code-dot-r{background:#ef4444}.code-dot-y{background:#f59e0b}.code-dot-g{background:#10b981}
+.code-explain-title{font-size:.72rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-left:4px}
+.code-line-wrap{padding:4px 0}
+.code-line{display:flex;align-items:flex-start;gap:0;cursor:pointer;transition:background .15s;border-radius:6px;margin:1px 6px}
+.code-line:hover{background:rgba(167,139,250,.08)}
+.code-line.has-note{background:rgba(59,130,246,.05)}
+.code-line.has-note:hover{background:rgba(59,130,246,.1)}
+.code-ln{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--text-dim);padding:6px 10px 6px 6px;min-width:32px;text-align:right;flex-shrink:0;user-select:none}
+.code-src{font-family:'JetBrains Mono',monospace;font-size:.83rem;color:var(--accent3);padding:6px 10px 6px 0;flex:1;white-space:pre;overflow-x:auto}
+.code-note-bubble{display:none;margin:0 6px 4px 46px;background:rgba(59,130,246,.1);border-left:3px solid var(--accent2);border-radius:0 8px 8px 0;padding:7px 12px;font-size:.8rem;color:#93c5fd;line-height:1.6;animation:fadeUp .2s ease}
+.code-line.open + .code-note-bubble{display:block}
+/* Syntax highlight helpers */
+.kw{color:#c4b5fd}.fn{color:#93c5fd}.st{color:#6ee7b7}.cm{color:var(--text-dim);font-style:italic}.nm{color:#fcd34d}.op{color:var(--text-mid)}
+
+.book-tip-box{display:flex;gap:10px;align-items:flex-start;background:rgba(0,212,170,.07);border:1px solid rgba(0,212,170,.2);border-radius:10px;padding:12px 14px;margin-top:12px}
+.tip-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.tip-text{font-size:.84rem;color:#a7f3d0;line-height:1.7}
+.book-warn-box{display:flex;gap:10px;align-items:flex-start;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 14px;margin-top:12px}
+.warn-text{font-size:.84rem;color:#fca5a5;line-height:1.7}
+.ai-fb{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px}
+.ai-fb-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ai-avatar{width:26px;height:26px;background:linear-gradient(135deg,var(--accent3),var(--accent2));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ai-name{font-size:.8rem;font-weight:700;color:var(--accent3)}
+.score-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.score-chip{display:flex;align-items:center;gap:5px;background:var(--surface2);border-radius:8px;padding:5px 10px;font-size:.78rem}
+.score-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.95rem}
+.sc-a .score-val{color:var(--success)}
+.sc-b .score-val{color:var(--warn)}
+.sc-c .score-val{color:var(--danger)}
+.ai-text{font-size:.82rem;color:var(--text-mid);line-height:1.7}
+.ai-text strong{color:var(--text)}
+.sug-list{list-style:none;margin-top:8px}
+.sug-list li{padding:7px 10px;border-radius:6px;font-size:.8rem;color:var(--text-mid);line-height:1.5;margin-bottom:5px;background:var(--surface2);border-left:2px solid var(--accent)}
+.sug-list li::before{content:'💡 '}
+.thinking{display:flex;align-items:center;gap:8px;color:var(--text-dim);font-size:.82rem;padding:10px 0}
+.dots span{display:inline-block;width:6px;height:6px;background:var(--accent3);border-radius:50%;animation:bounce 1s ease-in-out infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.pbar-wrap{background:var(--surface3);border-radius:4px;height:5px;overflow:hidden;margin-top:6px}
+.pbar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s}
+#page-ide{flex-direction:row !important;height:calc(100vh - 60px)}
+#page-notes{padding:36px}
+.notes-header{margin-bottom:24px}
+.notes-header h2{font-size:1.7rem;font-weight:800}
+.notes-header p{color:var(--text-mid);margin-top:5px}
+.notes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.note-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;transition:all .2s}
+.note-card:hover{border-color:var(--accent2)}
+.note-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.note-icon{font-size:1.4rem}
+.note-date{font-size:.7rem;color:var(--text-dim);font-family:'JetBrains Mono',monospace}
+.note-title{font-size:.92rem;font-weight:700;margin-bottom:6px}
+.note-text{font-size:.8rem;color:var(--text-mid);line-height:1.6}
+.note-code{background:var(--bg);border-radius:6px;padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--accent3);margin-top:8px;overflow-x:auto;white-space:pre}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:10px 18px;font-size:.83rem;z-index:1000;transform:translateY(20px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:var(--success)}
+.toast.err{border-color:var(--danger)}
+@media(max-width:900px){#page-problems{flex-direction:column !important;height:auto}.problems-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:220px}.output-panel{width:100%;min-width:100%;max-height:280px}.ide-workspace{flex-direction:column}.editor-panel{min-height:280px}}
+@media(max-width:600px){header{padding:0 10px}.nav-btn span{display:none}.hero h1{font-size:2rem}#page-home{padding:36px 14px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo"><div class="logo-icon">🧬</div>BioCode <span>Lab</span></div>
+  <nav>
+    <button class="nav-btn active" id="nav-home" onclick="showPage('home')">🏠 <span>Ana Sayfa</span></button>
+    <button class="nav-btn" id="nav-problems" onclick="showPage('problems')">🧪 <span>Problemler</span></button>
+    <button class="nav-btn" id="nav-ide" onclick="showPage('ide')">💻 <span>Serbest IDE</span></button>
+    <button class="nav-btn" id="nav-notes" onclick="showPage('notes')">📓 <span>Notlar</span></button>
+  </nav>
+  <div class="xp-badge"><div class="xp-dot"></div><span id="xp-display">0 XP</span></div>
+</header>
+
+<main>
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-badge">🧬 Bioinformatics &amp; Tissue Engineering</div>
+    <h1>Python ile Bilimi Kodla</h1>
+    <p>Biyoinformatik ve doku mühendisliğine özel 45 problem. Yaz, çalıştır, sonsuz ipucu al, kitap gibi açıklama oku.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="showPage('problems')">Problemlere Başla →</button>
+      <button class="btn-secondary" onclick="showPage('ide')">Serbest Kodlama</button>
+    </div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="num" id="stat-solved">0</div><div class="label">Çözülen</div></div>
+    <div class="stat-card"><div class="num">45</div><div class="label">Toplam</div></div>
+    <div class="stat-card"><div class="num">30</div><div class="label">Kolay</div></div>
+    <div class="stat-card"><div class="num">15</div><div class="label">Orta</div></div>
+    <div class="stat-card"><div class="num" id="stat-xp">0</div><div class="label">XP</div></div>
+  </div>
+  <div class="section-title">Konu <span>Alanları</span></div>
+  <div class="topics-grid">
+    <div class="topic-card" style="--tc:#00d4aa" onclick="filterAndGo('genomics')"><div class="topic-icon">🧬</div><div class="topic-name">Genomik &amp; DNA</div><div class="topic-desc">DNA dizileri, GC içeriği, transkripsiyon, mutasyon</div><div class="topic-meta"><span class="topic-count">10 problem</span><span class="diff-easy">Kolay→Orta</span></div></div>
+    <div class="topic-card" style="--tc:#3b82f6" onclick="filterAndGo('protein')"><div class="topic-icon">🔬</div><div class="topic-name">Protein Analizi</div><div class="topic-desc">Amino asit dizileri, FASTA formatı, mol. ağırlık</div><div class="topic-meta"><span class="topic-count">9 problem</span><span class="diff-easy">Kolay→Orta</span></div></div>
+    <div class="topic-card" style="--tc:#a78bfa" onclick="filterAndGo('tissue')"><div class="topic-icon">🫀</div><div class="topic-name">Doku Mühendisliği</div><div class="topic-desc">Hücre büyüme, iskele analizi, biyomateryaller</div><div class="topic-meta"><span class="topic-count">10 problem</span><span class="diff-easy">Kolay→Orta</span></div></div>
+    <div class="topic-card" style="--tc:#f59e0b" onclick="filterAndGo('stats')"><div class="topic-icon">📊</div><div class="topic-name">Biyoistatistik</div><div class="topic-desc">Ortalama, std sapma, t-testi, normalizasyon</div><div class="topic-meta"><span class="topic-count">9 problem</span><span class="diff-easy">Kolay→Orta</span></div></div>
+    <div class="topic-card" style="--tc:#10b981" onclick="filterAndGo('cell')"><div class="topic-icon">🦠</div><div class="topic-name">Hücre Biyolojisi</div><div class="topic-desc">Hücre sayımı, canlılık analizi, büyüme hesapları</div><div class="topic-meta"><span class="topic-count">7 problem</span><span class="diff-easy">Kolay→Orta</span></div></div>
+  </div>
+</div>
+
+<!-- PROBLEMS -->
+<div id="page-problems" class="page">
+  <div class="problems-sidebar">
+    <div class="sidebar-header">
+      <h2>🧪 Problem Listesi</h2>
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterProblems('all',this)">Tümü</button>
+        <button class="filter-tab" onclick="filterProblems('genomics',this)">🧬 DNA</button>
+        <button class="filter-tab" onclick="filterProblems('protein',this)">🔬 Protein</button>
+        <button class="filter-tab" onclick="filterProblems('tissue',this)">🫀 Doku</button>
+        <button class="filter-tab" onclick="filterProblems('stats',this)">📊 İstat.</button>
+        <button class="filter-tab" onclick="filterProblems('cell',this)">🦠 Hücre</button>
+      </div>
+    </div>
+    <div class="problem-list" id="problem-list"></div>
+  </div>
+  <div class="ide-area">
+    <div class="problem-header" id="problem-header">
+      <h2>← Bir problem seçin</h2>
+      <p class="problem-desc">Soldan bir problem seçerek kodlamaya başlayın.</p>
+    </div>
+    <div class="ide-workspace">
+      <div class="editor-panel">
+        <div class="editor-toolbar">
+          <div class="editor-lang"><div class="lang-dot"></div>Python 3</div>
+          <div class="toolbar-right">
+            <button class="hint-btn" id="hint-btn" onclick="getHint()" disabled>💡 İpucu</button>
+            <button class="explain-btn" id="explain-btn" onclick="openExplain()" disabled>📖 Anlatma</button>
+            <button class="run-btn" id="run-btn" onclick="runCode()">
+              <div class="spinner" id="run-spinner"></div>
+              <span id="run-text">▶ Çalıştır</span>
+            </button>
+          </div>
+        </div>
+        <div class="code-editor-wrapper">
+          <div class="line-numbers" id="line-numbers"></div>
+          <textarea class="code-input" id="code-editor" spellcheck="false" placeholder="Bir problem seçin..." oninput="syncLines()" onkeydown="handleTab(event)" onscroll="syncScroll()"></textarea>
+        </div>
+      </div>
+      <div class="output-panel">
+        <div class="output-tabs">
+          <button class="output-tab active" onclick="showTab('out',this)">Çıktı</button>
+          <button class="output-tab" onclick="showTab('hints',this)">💡 İpuçları</button>
+          <button class="output-tab" onclick="showTab('fb',this)">🤖 Değerlendirme</button>
+        </div>
+        <div class="output-content visible" id="out"><div class="placeholder"><div class="icon">⚡</div><p><strong>▶ Çalıştır</strong> butonuna tıklayın</p></div></div>
+        <div class="output-content" id="hints"><div class="placeholder"><div class="icon">💡</div><p>Her <strong>İpucu</strong> butonuna basışta yeni ipucu gelir</p></div></div>
+        <div class="output-content" id="fb"><div class="placeholder"><div class="icon">🤖</div><p>Kodu çalıştırdıktan sonra AI değerlendirmesi görünür</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FREE IDE -->
+<div id="page-ide" class="page">
+  <div class="ide-area">
+    <div class="problem-header"><h2>💻 Serbest IDE</h2><p class="problem-desc">İstediğin Python kodunu yaz ve çalıştır.</p></div>
+    <div class="ide-workspace">
+      <div class="editor-panel">
+        <div class="editor-toolbar">
+          <div class="editor-lang"><div class="lang-dot"></div>Python 3</div>
+          <button class="run-btn" onclick="runFree()">▶ Çalıştır</button>
+        </div>
+        <div class="code-editor-wrapper">
+          <div class="line-numbers" id="free-ln"></div>
+          <textarea class="code-input" id="free-editor" spellcheck="false" oninput="syncFreeLines()" onkeydown="handleTab(event)" onscroll="syncFreeScroll()"></textarea>
+        </div>
+      </div>
+      <div class="output-panel">
+        <div class="output-tabs"><button class="output-tab active">Çıktı</button></div>
+        <div class="output-content visible" id="free-out"><div class="placeholder"><div class="icon">🚀</div><p>Kodu yazın ve çalıştırın</p></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTES -->
+<div id="page-notes" class="page">
+  <div class="notes-header"><h2>📓 Python Notlarım</h2><p>Çözülen problemlerden AI'nın önerdiği kavramlar</p></div>
+  <div class="notes-grid" id="notes-grid">
+    <div class="note-card"><div class="note-card-top"><div class="note-icon">🧬</div><div class="note-date">BioCode Lab</div></div><div class="note-title">GC İçeriği</div><div class="note-text">DNA'nın termal kararlılığını gösterir.</div><div class="note-code">gc = (s.count('G')+s.count('C'))/len(s)*100</div></div>
+    <div class="note-card"><div class="note-card-top"><div class="note-icon">🫀</div><div class="note-date">BioCode Lab</div></div><div class="note-title">Lojistik Büyüme</div><div class="note-text">Hücre kültüründe büyüme modeli.</div><div class="note-code">N = K/(1+((K-N0)/N0)*math.exp(-r*t))</div></div>
+    <div class="note-card"><div class="note-card-top"><div class="note-icon">🔬</div><div class="note-date">BioCode Lab</div></div><div class="note-title">Mol. Ağırlık</div><div class="note-text">Peptid bağında su kaybedilir.</div><div class="note-code">mw = sum(W[aa] for aa in p) - 18.02*(len(p)-1)</div></div>
+  </div>
+</div>
+</main>
+
+<!-- EXPLAIN MODAL -->
+<div class="modal-overlay" id="explain-modal" onclick="bgClose(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>📖 <span>Kitap</span> Anlatımı</h3>
+      <button class="modal-close" onclick="closeExplain()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"><div class="thinking"><div class="dots"><span></span><span></span><span></span></div><span>Hazırlanıyor...</span></div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- STARTER CODES stored safely as JSON in a data element -->
+<script id="starter-data" type="application/json">
+{
+  "1":  "# DNA dizisinin GC icerigini hesaplayin\ndna = \"ATCGATCGGCTATCGGCATCG\"\n\ndef gc_icerik(dizi):\n    # G ve C'yi say, toplama bol, 100 ile carp\n    pass\n\nsonuc = gc_icerik(dna)\nprint(\"GC Icerigi: \" + str(round(sonuc, 2)) + \"%\")",
+  "2":  "# DNA baz sayimi\ndna = \"AATCGGCTATCGGCATCGAATC\"\n\ndef baz_say(dizi):\n    # A, T, G, C kac kez var?\n    pass\n\nsonuc = baz_say(dna)\nprint(\"Toplam uzunluk: \" + str(len(dna)))\nfor baz, sayi in sonuc.items():\n    print(baz + \": \" + str(sayi))",
+  "3":  "# DNA tamamlayici zincir\ndna = \"ATCGGCTATGA\"\n\ndef tamamlayici(dizi):\n    eslesme = {\"A\":\"T\", \"T\":\"A\", \"G\":\"C\", \"C\":\"G\"}\n    # Her baz icin karsiligini dondur\n    pass\n\nprint(\"Orijinal  : 5'-\" + dna + \"-3'\")\nprint(\"Tamamlayici: 3'-\" + str(tamamlayici(dna)) + \"-5'\")",
+  "4":  "# DNA Transkripsiyon\ntemplate_dna = \"TACGAGCTTAATCGG\"\n\ndef transkripsiyon(template):\n    # A->U, T->A, G->C, C->G\n    pass\n\nmrna = transkripsiyon(template_dna)\nprint(\"Template DNA: \" + template_dna)\nprint(\"mRNA       : \" + str(mrna))",
+  "5":  "# DNA Palindromu Kontrolu\ntest_dizileri = [\"GAATTC\", \"AAGCTT\", \"ATCGAT\", \"ATCGTA\"]\n\ndef palindrom_mu(dizi):\n    # Tamamlayici zinciri bul ve tersine cevir\n    # Orijinalle karsilastir\n    pass\n\nfor d in test_dizileri:\n    sonuc = palindrom_mu(d)\n    durum = \"Palindrom\" if sonuc else \"Degil\"\n    print(d + \": \" + durum)",
+  "6":  "# ATG Baslangic Kodonu Arama\ndna = \"AACGATGGCTATGATCGATGTTC\"\n\ndef atg_bul(dizi):\n    pozisyonlar = []\n    # ATG'nin tum pozisyonlarini bul\n    pass\n\npozlar = atg_bul(dna)\nprint(\"ATG sayisi: \" + str(len(pozlar)))\nprint(\"Pozisyonlar: \" + str(pozlar))",
+  "7":  "# DNA Dizi Benzerligi\ndizi1 = \"ATCGATCGATCG\"\ndizi2 = \"ATCGTTCGATCG\"\n\ndef benzerlik(d1, d2):\n    # Her pozisyonda eslesme var mi? Say.\n    pass\n\nyuzde = benzerlik(dizi1, dizi2)\nprint(\"Dizi 1: \" + dizi1)\nprint(\"Dizi 2: \" + dizi2)\nprint(\"Benzerlik: \" + str(round(yuzde,1)) + \"%\")",
+  "8":  "# mRNA Translasyon\nKODON = {\"AUG\":\"Met\",\"UUU\":\"Phe\",\"UUC\":\"Phe\",\"UUA\":\"Leu\",\"UUG\":\"Leu\",\"CUU\":\"Leu\",\"CUC\":\"Leu\",\"CUA\":\"Leu\",\"CUG\":\"Leu\",\"AUU\":\"Ile\",\"AUC\":\"Ile\",\"AUA\":\"Ile\",\"GUU\":\"Val\",\"GUC\":\"Val\",\"GUA\":\"Val\",\"GUG\":\"Val\",\"UCU\":\"Ser\",\"UCC\":\"Ser\",\"UCA\":\"Ser\",\"UCG\":\"Ser\",\"CCU\":\"Pro\",\"CCC\":\"Pro\",\"CCA\":\"Pro\",\"CCG\":\"Pro\",\"ACU\":\"Thr\",\"ACC\":\"Thr\",\"ACA\":\"Thr\",\"ACG\":\"Thr\",\"GCU\":\"Ala\",\"GCC\":\"Ala\",\"GCA\":\"Ala\",\"GCG\":\"Ala\",\"UAU\":\"Tyr\",\"UAC\":\"Tyr\",\"CAU\":\"His\",\"CAC\":\"His\",\"CAA\":\"Gln\",\"CAG\":\"Gln\",\"AAU\":\"Asn\",\"AAC\":\"Asn\",\"AAA\":\"Lys\",\"AAG\":\"Lys\",\"GAU\":\"Asp\",\"GAC\":\"Asp\",\"GAA\":\"Glu\",\"GAG\":\"Glu\",\"UGU\":\"Cys\",\"UGC\":\"Cys\",\"UGG\":\"Trp\",\"CGU\":\"Arg\",\"AGG\":\"Arg\",\"GGU\":\"Gly\",\"GGG\":\"Gly\",\"UAA\":\"STOP\",\"UAG\":\"STOP\",\"UGA\":\"STOP\"}\nmrna = \"AUGGUUCUUUAA\"\n\ndef translasyon(mrna):\n    protein = []\n    # 3'lu gruplari oku\n    pass\n\nprint(\"mRNA   : \" + mrna)\nprint(\"Protein: \" + str(translasyon(mrna)))",
+  "9":  "# Mutasyon Analizi\norijinal = \"ATCGATCGATCG\"\nmutant   = \"ATCGTTCAATCG\"\n\ndef mutasyon_bul(d1, d2):\n    mutasyonlar = []\n    # Pozisyon pozisyon karsilastir\n    pass\n\nmutlar = mutasyon_bul(orijinal, mutant)\nprint(\"Toplam mutasyon: \" + str(len(mutlar)))\nfor m in mutlar:\n    print(\"  Poz \" + str(m['pos']) + \": \" + m['eski'] + \" -> \" + m['yeni'])",
+  "10": "# ORF Bulma\ndna = \"GCAATGCCGATGTTTAAAGCATGAAGTAGCC\"\nDUR = {\"TAA\", \"TAG\", \"TGA\"}\n\ndef orf_bul(dizi):\n    orfler = []\n    # ATG'leri bul, dur kodonuna kadar ilerle\n    pass\n\norfler = orf_bul(dna)\nprint(\"Bulunan ORF sayisi: \" + str(len(orfler)))\nfor o in orfler:\n    print(\"  Baslangic:\" + str(o['baslangic']) + \" Bitis:\" + str(o['bitis']) + \" | \" + o['dizi'])",
+  "11": "from collections import Counter\n\nprotein = \"MGLKVLRAAFMGLKVLRSSTTKKAAGLM\"\n\ndef aa_say(dizi):\n    # Her amino asitin kac kez gectigi\n    pass\n\nsonuc = aa_say(protein)\nprint(\"Amino Asit Frekanslari:\")\nfor aa, sayi in sonuc:\n    print(\"  \" + aa + \": \" + str(sayi))",
+  "12": "protein = \"MGLKVLRAAFMGLKVLRSSTT\"\n\ndef protein_analiz(dizi):\n    tum_aa = \"ACDEFGHIKLMNPQRSTVWY\"\n    # Uzunluk, ilk/son aa, eksik aa'ler\n    pass\n\nsonuc = protein_analiz(protein)\nprint(\"Uzunluk: \" + str(sonuc['uzunluk']))\nprint(\"Ilk AA : \" + sonuc['ilk'])\nprint(\"Son AA : \" + sonuc['son'])\nprint(\"Eksik  : \" + str(sonuc['eksik']))",
+  "13": "protein = \"MKLVRAFDESTKMRQEGLAA\"\n\ndef yuk_analiz(dizi):\n    # Pozitif: K,R,H  Negatif: D,E\n    pass\n\nsonuc = yuk_analiz(protein)\nprint(\"Pozitif (+): \" + str(sonuc['poz_sayi']) + \" (\" + str(round(sonuc['poz_yuzde'],1)) + \"%)\")\nprint(\"Negatif (-): \" + str(sonuc['neg_sayi']) + \" (\" + str(round(sonuc['neg_yuzde'],1)) + \"%)\")\nprint(\"Net yuk    : \" + str(sonuc['net_yuk']))",
+  "14": "protein = \"MGLKVLAAFMGLKVLRSSTTFWPA\"\nHIDROFOBIK = \"AVILMFWP\"\n\ndef hidrofobik_analiz(dizi):\n    # Hidrofobik AA'leri say\n    pass\n\nsonuc = hidrofobik_analiz(protein)\nprint(\"Hidrofobik sayi  : \" + str(sonuc['sayi']))\nprint(\"Hidrofobik yuzde : \" + str(round(sonuc['yuzde'],1)) + \"%\")\nprint(\"Pozisyonlar      : \" + str(sonuc['pozisyonlar']))",
+  "15": "protein = \"MAEGEITTFTALTEKFNLPPG\"\n\ndef protein_ters(dizi):\n    # Ters cevir, N ve C terminal\n    pass\n\nsonuc = protein_ters(protein)\nprint(\"Orijinal   : \" + protein)\nprint(\"Ters       : \" + sonuc['ters'])\nprint(\"N-terminal : \" + sonuc['n_terminal'])\nprint(\"C-terminal : \" + sonuc['c_terminal'])",
+  "16": "from collections import Counter\n\nprotein = \"MGLKVLRAAFMGLKVLRSSTTKKAAGLM\"\n\ndef dipeptit_say(dizi):\n    # 2'li gruplari say\n    pass\n\nen_sik = dipeptit_say(protein)\nprint(\"En sik 5 dipeptit:\")\nfor dp, sayi in en_sik:\n    print(\"  \" + dp + \": \" + str(sayi) + \" kez\")",
+  "17": "AA_W = {'A':89.1,'R':174.2,'N':132.1,'D':133.1,'C':121.2,'E':147.1,'Q':146.2,'G':75.0,'H':155.2,'I':131.2,'L':131.2,'K':146.2,'M':149.2,'F':165.2,'P':115.1,'S':105.1,'T':119.1,'W':204.2,'Y':181.2,'V':117.1}\nprotein = \"MGLKVLRAAF\"\n\ndef mol_agirlik(dizi):\n    # Agirliklari topla, su kayiplarini cikar\n    pass\n\nmw = mol_agirlik(protein)\nprint(\"Protein : \" + protein)\nprint(\"MW      : \" + str(round(mw,1)) + \" Da\")\nprint(\"kDa     : \" + str(round(mw/1000,2)) + \" kDa\")",
+  "18": "fasta = \">sp|P04637|TP53\\nMEEPQSDPSVEPPLSQ\\nKLLPENNVLS\\n>sp|P68871|HBB\\nMVHLTPEEKSAVT\\nALWGKVNVDE\\n\"\n\ndef fasta_oku(veri):\n    kayitlar = {}\n    # > ile baslayan satirlar baslik\n    pass\n\nkayitlar = fasta_oku(fasta)\nfor baslik, dizi in kayitlar.items():\n    print(\"ID     : \" + baslik[:20])\n    print(\"Uzunluk: \" + str(len(dizi)) + \" aa\")\n    print()",
+  "19": "protein = \"MGLKVLRAAFDESTKM\"\nPKA = {'D':3.9,'E':4.1,'H':6.0,'K':10.5,'R':12.5}\n\ndef pi_tahmin(dizi):\n    # Asidik ve bazik gruplari say\n    pass\n\npi = pi_tahmin(protein)\nprint(\"Protein  : \" + protein)\nprint(\"Tahmini pI: \" + str(round(pi,1)))\nyorum = \"Asidik\" if pi < 7 else \"Bazik\"\nprint(\"Yorum    : \" + yorum + \" protein\")",
+  "20": "import math\n\nsayimlar = [48, 52, 45, 55, 50]\nseyreltme = 10\n\ndef hucre_yogunlugu(sayimlar, seyreltme):\n    ort = sum(sayimlar) / len(sayimlar)\n    # std sapma ve konsantrasyon hesapla\n    pass\n\nsonuc = hucre_yogunlugu(sayimlar, seyreltme)\nprint(\"Ort sayim    : \" + str(round(sonuc['ort'],1)))\nprint(\"Konsantrasyon: \" + \"{:.2e}\".format(sonuc['kons']) + \" hucre/mL\")\nprint(\"CV%          : \" + str(round(sonuc['cv'],1)) + \"%\")",
+  "21": "import math\n\nbaslangic = 15.0\nhedef = 80.0\ngun1 = 15.0\ngun3 = 45.0\n\ndef pasaj_gun(baslangic, hedef, gun1, gun3):\n    # Gunluk buyume hizini bul\n    # Hedef konfluansa kac gunde ulasilir?\n    pass\n\ngun = pasaj_gun(baslangic, hedef, gun1, gun3)\nprint(\"Baslangic    : %\" + str(baslangic))\nprint(\"Gunluk buyume: %\" + str((gun3-gun1)/2))\nprint(\"Pasaj gunu   : \" + str(gun) + \". gun\")",
+  "22": "import math\n\nrho_gercek  = 3.16\nrho_gorunen = 0.48\ncap_cm = 1.2\nyuk_cm = 0.8\n\ndef porozite(rg, rgor):\n    # (1 - gorunen/gercek) * 100\n    pass\n\ndef hacim_silindir(cap, yuk):\n    # pi * (cap/2)^2 * yuk\n    pass\n\npor = porozite(rho_gercek, rho_gorunen)\nv = hacim_silindir(cap_cm, yuk_cm)\nprint(\"Porozite : %\" + str(round(por,1)))\nprint(\"Hacim    : \" + str(round(v,3)) + \" cm3\")\nprint(\"Kutle    : \" + str(round(rho_gorunen*v,3)) + \" g\")",
+  "23": "stok_kons = 1000.0\nson_kons  = 10.0\nson_hacim = 1.0\n\ndef seyreltme(C1, C2, V2):\n    # V1 = (C2 * V2) / C1\n    pass\n\nV1, Vcoz = seyreltme(stok_kons, son_kons, son_hacim)\nprint(\"Stoktan al  : \" + str(round(V1*1000,2)) + \" uL\")\nprint(\"Cozucu ekle : \" + str(round(Vcoz*1000,2)) + \" uL\")",
+  "24": "veriler = {0:[0.892,0.881,0.905], 10:[0.845,0.861,0.838], 25:[0.723,0.741,0.698], 50:[0.542,0.528,0.561], 100:[0.312,0.298,0.327], 200:[0.124,0.131,0.118]}\n\ndef canlilik(veriler):\n    kontrol_ort = sum(veriler[0]) / len(veriler[0])\n    sonuclar = {}\n    # Her konsantrasyon icin % canlilik\n    pass\n\nsonuclar = canlilik(veriler)\nprint(\"Konsantrasyon | Canlilik%\")\nfor k, c in sonuclar.items():\n    bar = \"#\" * int(c/5)\n    print(str(k) + \" ug/mL  | \" + str(round(c,1)) + \"% \" + bar)",
+  "25": "bilesimler = {\"NaCl\":(137,2),\"KCl\":(2.7,2),\"Glukoz\":(5.5,1),\"NaHCO3\":(44,2),\"HEPES\":(10,1)}\n\ndef osmolarite(bilesimler):\n    toplam = 0\n    # Her bilesimin katki = kons * iyon_sayisi\n    pass\n\nosm = osmolarite(bilesimler)\nprint(\"Osmolarite: \" + str(round(osm,1)) + \" mOsm/L\")\nprint(\"Fizyolojik Aralik: 280-320 mOsm/L\")\nyorum = \"Normal\" if 280 <= osm <= 320 else \"Kontrol et\"\nprint(\"Degerlendirme: \" + yorum)",
+  "26": "import math\n\nN0 = 50000\nN  = 200000\nt  = 24\n\ndef cift_katlanma(N0, N, t):\n    # Td = t * ln(2) / ln(N/N0)\n    pass\n\nTd = cift_katlanma(N0, N, t)\nprint(\"Baslangic: \" + str(N0) + \" hucre\")\nprint(\"Son      : \" + str(N) + \" hucre\")\nprint(\"Cift katlanma suresi: \" + str(round(Td,1)) + \" saat\")",
+  "27": "import math\n\nN0 = 1000\nK  = 100000\nr  = 0.3\n\ndef logistik(N0, K, r, t):\n    # N(t) = K / (1 + ((K-N0)/N0) * exp(-r*t))\n    pass\n\nprint(\"Zaman (saat) | Hucre Sayisi | Doluluk%\")\nprint(\"-\" * 42)\nfor t in [0, 6, 12, 24, 48, 72]:\n    N = logistik(N0, K, r, t)\n    print(\"t=\" + str(t) + \" saat  | \" + str(int(N)) + \"  | %\" + str(round(N/K*100,1)))",
+  "28": "import math\n\nD_su = 2.1e-5\nporozite = 0.85\ntortuosity = 1.5\nC_yuzey  = 0.214\nC_merkez = 0.05\nkalinlik = 0.2\n\ndef efektif_D(D, p, tau):\n    # D_eff = D * p / tau^2\n    pass\n\ndef o2_akisi(D_eff, C1, C2, dx):\n    # J = -D * (C1 - C2) / dx\n    pass\n\nD_eff = efektif_D(D_su, porozite, tortuosity)\nJ = o2_akisi(D_eff, C_yuzey, C_merkez, kalinlik)\nprint(\"D_eff   : \" + \"{:.3e}\".format(D_eff) + \" cm2/s\")\nprint(\"O2 akisi: \" + \"{:.5f}\".format(abs(J)) + \" mM.cm/s\")",
+  "29": "rho = 1000.0\nmu  = 0.001\nD   = 0.05\n\ndef reynolds(rho, v, D, mu):\n    # Re = rho * v * D / mu\n    pass\n\ndef akis_tipi(Re):\n    if Re < 2300: return \"Laminar - guvenli\"\n    elif Re > 4000: return \"Turbulansli - dikkat\"\n    return \"Gecis bolgesi\"\n\nprint(\"Hiz (m/s) | Reynolds | Akis Tipi\")\nprint(\"-\" * 50)\nfor v in [0.01, 0.05, 0.1, 0.5, 1.0]:\n    Re = reynolds(rho, v, D, mu)\n    print(str(v) + \"  | \" + str(int(Re)) + \" | \" + akis_tipi(Re))",
+  "30": "gen_data = [4.2, 5.8, 3.9, 6.1, 4.7, 5.2, 4.9, 6.3, 3.8, 5.5]\n\ndef ortalama(veri):\n    pass\n\ndef medyan(veri):\n    sirali = sorted(veri)\n    n = len(sirali)\n    # Cift mi tek mi?\n    pass\n\nprint(\"Ortalama : \" + str(round(ortalama(gen_data),4)))\nprint(\"Medyan   : \" + str(round(medyan(gen_data),4)))",
+  "31": "import math\n\nveri = [4.2, 5.8, 3.9, 6.1, 4.7, 5.2, 4.9, 6.3, 3.8, 5.5]\n\ndef varyans(veri):\n    ort = sum(veri) / len(veri)\n    # sum((xi-ort)^2) / (n-1)\n    pass\n\ndef std_sapma(veri):\n    # karekök(varyans)\n    pass\n\nprint(\"Varyans  : \" + str(round(varyans(veri),4)))\nprint(\"Std Sapma: \" + str(round(std_sapma(veri),4)))",
+  "32": "olcumler = [2.1,3.4,1.8,5.6,4.2,3.1,6.8,2.9,4.7,3.5,1.9,5.1,4.4,3.3,2.8,6.1,4.9,3.7,2.5,5.8]\n\ndef betimleyici(veri):\n    sirali = sorted(veri)\n    n = len(sirali)\n    # Min, max, aralik, Q1, Q3, IQR\n    pass\n\ns = betimleyici(olcumler)\nprint(\"Min  : \" + str(round(s['min'],2)))\nprint(\"Max  : \" + str(round(s['max'],2)))\nprint(\"IQR  : \" + str(round(s['iqr'],2)))",
+  "33": "import math\n\ngen_data = {\"BRCA1\":8.2,\"TP53\":6.1,\"EGFR\":12.4,\"MYC\":9.8,\"CDK2\":7.3,\"VEGF\":15.2,\"PDGF\":5.9,\"TGF-B\":8.7}\n\ndef z_score(veri_dict):\n    degerler = list(veri_dict.values())\n    ort = sum(degerler)/len(degerler)\n    std = math.sqrt(sum((x-ort)**2 for x in degerler)/(len(degerler)-1))\n    # Her gen icin z-score hesapla\n    pass\n\nsonuclar = z_score(gen_data)\nprint(\"Gen        | Orijinal | Z-Score | Durum\")\nprint(\"-\"*50)\nfor gen,(orig,z) in sonuclar.items():\n    durum = \"OUTLIER\" if abs(z)>2 else \"Normal\"\n    print(gen.ljust(10) + \" | \" + str(orig).ljust(8) + \" | \" + str(round(z,3)) + \" | \" + durum)",
+  "34": "import math\n\ngen_A = [2.1, 3.4, 5.6, 4.2, 6.8, 3.1, 7.2, 5.9]\ngen_B = [1.8, 3.1, 5.2, 4.0, 6.5, 2.9, 6.9, 5.6]\n\ndef pearson_r(x, y):\n    n = len(x)\n    mx = sum(x)/n\n    my = sum(y)/n\n    # Kovaryans ve std hesapla\n    pass\n\nr = pearson_r(gen_A, gen_B)\nprint(\"Pearson r = \" + str(round(r,4)))\nyorum = \"Guclu pozitif\" if r > 0.8 else (\"Orta\" if r > 0.5 else \"Zayif\")\nprint(\"Yorum: \" + yorum + \" korelasyon\")",
+  "35": "import math\n\nveri = [4.2,5.8,3.9,6.1,4.7,5.2,4.9,6.3,3.8,5.5,4.1,5.9,4.4,6.0,5.1,4.6,5.7,3.7,6.2,5.0,4.3,5.4,3.6,6.4,5.3]\n\ndef histogram(veri, bin_sayisi=5):\n    min_v = min(veri)\n    max_v = max(veri)\n    genislik = (max_v - min_v) / bin_sayisi\n    # Siniflari olustur ve frekanslari say\n    pass\n\nprint(\"Gen Ekspresyon Histogrami:\")\nhistogram(veri, 5)",
+  "36": "import math\n\ngrupA = [0.45,0.48,0.43,0.51,0.47,0.46,0.49,0.44]\ngrupB = [0.38,0.41,0.36,0.40,0.39,0.37,0.42,0.35]\n\ndef ort(d): return sum(d)/len(d)\ndef std(d):\n    m = ort(d); n = len(d)\n    return math.sqrt(sum((x-m)**2 for x in d)/(n-1))\n\ndef welch_t(g1, g2):\n    # t = (ort1-ort2) / sqrt(s1^2/n1 + s2^2/n2)\n    pass\n\nt, df = welch_t(grupA, grupB)\nprint(\"Grup A: ort=\" + str(round(ort(grupA),3)))\nprint(\"Grup B: ort=\" + str(round(ort(grupB),3)))\nprint(\"t = \" + str(round(t,4)) + \", df = \" + str(round(df,1)))\nsonuc = \"Anlamli fark var\" if abs(t) > 2.145 else \"Anlamli fark yok\"\nprint(\"Sonuc: \" + sonuc)",
+  "37": "# Hucre buyume verisi\nzaman = [0, 6, 12, 18, 24, 30, 36]\nhucre = [1.0, 1.8, 3.2, 5.1, 7.9, 11.2, 15.8]\n\ndef lineer_regresyon(x, y):\n    n = len(x)\n    mx = sum(x)/n\n    my = sum(y)/n\n    # Egim m ve kesim b hesapla\n    # R^2 hesapla\n    pass\n\nm, b, r2 = lineer_regresyon(zaman, hucre)\nprint(\"Denklem: y = \" + str(round(m,3)) + \"x + \" + str(round(b,3)))\nprint(\"R2      : \" + str(round(r2,4)))",
+  "38": "gozlenen = {\"AB\":315, \"Ab\":101, \"aB\":108, \"ab\":32}\nbeklenen_oran = {\"AB\":9/16, \"Ab\":3/16, \"aB\":3/16, \"ab\":1/16}\n\ndef chi_kare(goz, bek_oran):\n    toplam = sum(goz.values())\n    # Her kategori icin beklenen hesapla\n    # X2 = sum((O-E)^2/E)\n    pass\n\nki2, df = chi_kare(gozlenen, beklenen_oran)\nprint(\"X2 = \" + str(round(ki2,4)))\nprint(\"df = \" + str(df))\nsonuc = \"Mendel oranina UYUYOR\" if ki2 < 7.815 else \"Uymuyor\"\nprint(\"Sonuc: \" + sonuc)",
+  "39": "import math\n\nhucreler = {\n    \"Kirmizi kan hucresi (disk)\": {\"sekil\":\"disk\",    \"r\":4.0, \"h\":2.0},\n    \"Yuvarlak T hucresi (kure)\" : {\"sekil\":\"kure\",    \"r\":4.5},\n    \"E.coli bakteri (silindir)\" : {\"sekil\":\"silindir\",\"r\":0.5, \"h\":2.0}\n}\n\ndef hacim(bilgi):\n    if bilgi[\"sekil\"] == \"kure\":\n        pass  # (4/3) * pi * r^3\n    else:\n        pass  # pi * r^2 * h\n\nfor isim, bilgi in hucreler.items():\n    v = hacim(bilgi)\n    print(isim + \": \" + str(round(v,2)) + \" um3\")",
+  "40": "import math\n\nyaricaplar = [1, 2, 5, 10, 20, 50]\n\ndef sa_v_orani(r):\n    sa = 4 * math.pi * r**2\n    v  = (4/3) * math.pi * r**3\n    return sa / v\n\nprint(\"Yaricap(um) | SA(um2)   | V(um3)    | SA/V\")\nprint(\"-\" * 50)\nfor r in yaricaplar:\n    sa = 4 * math.pi * r**2\n    v  = (4/3) * math.pi * r**3\n    oran = sa_v_orani(r)\n    print(str(r).ljust(11) + \" | \" + str(round(sa,2)).ljust(9) + \" | \" + str(round(v,2)).ljust(9) + \" | \" + str(round(oran,4)))",
+  "41": "N0 = 1\nTd = 24\n\ndef mitoz(N0, Td, saat):\n    n = saat / Td\n    # N = N0 * 2^n\n    pass\n\nprint(\"Sure (saat) | Bolunme | Hucre Sayisi\")\nprint(\"-\" * 40)\nfor saat in [0, 24, 48, 72, 96, 120]:\n    N = mitoz(N0, Td, saat)\n    print(str(saat).ljust(11) + \" | \" + str(int(saat//Td)).ljust(7) + \" | \" + str(int(N)))",
+  "42": "R = 0.0821\n\ncozeltiler = {\n    \"Fizyolojik SF\": {\"i\":2,  \"C\":0.154, \"T_C\":37},\n    \"Glukoz %5\"    : {\"i\":1,  \"C\":0.278, \"T_C\":37},\n    \"Saf Su\"        : {\"i\":1,  \"C\":0.0,   \"T_C\":37}\n}\nhucre_ici = 7.7\n\ndef osmotik(i, C, T_C):\n    T_K = T_C + 273.15\n    # pi = iCRT\n    pass\n\nfor isim, p in cozeltiler.items():\n    pi = osmotik(p[\"i\"], p[\"C\"], p[\"T_C\"])\n    if pi > hucre_ici: durum = \"Hipertonik\"\n    elif pi < hucre_ici: durum = \"Hipotonik\"\n    else: durum = \"Izotonik\"\n    print(isim + \": \" + str(round(pi,2)) + \" atm - \" + durum)",
+  "43": "import math\n\nzaman  = [0,1,2,3,4,5,6,8,10,12,14,16,18,20]\nOD600  = [0.05,0.055,0.062,0.12,0.24,0.48,0.95,3.2,7.8,12.1,13.5,13.8,13.9,13.9]\n\ndef buyume_hizi(OD1, OD2, t1, t2):\n    if OD1 <= 0: return 0\n    return math.log(OD2/OD1) / (t2-t1)\n\ndef faz(mu):\n    if mu < 0.05: return \"Lag/Stasiyoner\"\n    elif mu < 0.3: return \"Erken Log\"\n    return \"Log fazi\"\n\nprint(\"Zaman | OD600  | mu(/s)   | Faz\")\nprint(\"-\"*50)\nfor i in range(1, len(zaman)):\n    mu = buyume_hizi(OD600[i-1], OD600[i], zaman[i-1], zaman[i])\n    print(str(zaman[i]).ljust(5) + \" | \" + str(OD600[i]).ljust(6) + \" | \" + str(round(mu,4)).ljust(8) + \" | \" + faz(mu))",
+  "44": "kontrol = {\"Q1_erken\":120,  \"Q2_gec\":45,  \"Q3_nekroz\":38,  \"Q4_canli\":9800}\ntedavi  = {\"Q1_erken\":1250, \"Q2_gec\":680, \"Q3_nekroz\":95, \"Q4_canli\":7975}\n\ndef apoptoz(k):\n    toplam = sum(k.values())\n    # Her kadrantin yuzdesini hesapla\n    pass\n\nfor etiket, grup in [(\"KONTROL\", kontrol),(\"TEDAVI\", tedavi)]:\n    s = apoptoz(grup)\n    print(\"=== \" + etiket + \" ===\")\n    print(\"Canli         : %\" + str(round(s['canli'],1)))\n    print(\"Erken apoptoz : %\" + str(round(s['erken'],1)))\n    print(\"Apoptoz indeks: %\" + str(round(s['apoptoz_indeksi'],1)))\n    print()",
+  "45": "zaman     = [0, 4, 8, 12, 16, 20, 24]\nkontrol_um = [500,478,452,431,415,404,395]\negf_um     = [500,445,378,298,215,142,68]\n\ndef kapanma(genis):\n    A0 = genis[0]\n    # Her zaman icin % kapanma\n    pass\n\ndef hiz(zaman, genis):\n    toplam_kapanma = genis[0] - genis[-1]\n    return toplam_kapanma / zaman[-1]\n\nk = kapanma(kontrol_um)\ne = kapanma(egf_um)\nprint(\"Saat  | Kontrol% | EGF%\")\nprint(\"-\"*30)\nfor i,t in enumerate(zaman):\n    print(str(t).ljust(5) + \" | \" + str(round(k[i],1)).ljust(8) + \" | \" + str(round(e[i],1)))\nprint(\"\\nKontrol hizi: \" + str(round(hiz(zaman,kontrol_um),2)) + \" um/saat\")\nprint(\"EGF hizi    : \" + str(round(hiz(zaman,egf_um),2)) + \" um/saat\")"
+}
+</script>
+
+<script>
+// ── PROBLEMS DATA ──────────────────────────────────────────────────────────
+var PROBLEMS = [
+  {id:1,  cat:'genomics', dif:'easy',   title:'GC İçeriği Hesaplama',       tags:['DNA','string'],       desc:'Verilen DNA dizisinin GC içeriğini % olarak hesaplayın. GC = (G+C) / toplam baz × 100', hints:['str.count("G") ile G bazlarını sayabilirsin.','gc_sayi = dizi.count("G") + dizi.count("C")','Toplam baz: toplam = len(dizi)','Yüzde: gc_sayi / toplam * 100','Tam: return (dizi.count("G")+dizi.count("C"))/len(dizi)*100']},
+  {id:2,  cat:'genomics', dif:'easy',   title:'DNA Baz Sayımı',             tags:['DNA','dict'],         desc:'A, T, G, C bazlarını sayın. Her bazın kaç kez geçtiğini bulun.', hints:['Her baz için dizi.count("A") gibi say.','Sonuçları dict içinde topla: {"A":..., "T":...}','Ya da: for baz in "ATGC": sonuc[baz] = dizi.count(baz)','Toplam kontrolü: A+T+G+C == len(dizi) olmalı.','return {"A":dizi.count("A"), "T":dizi.count("T"), ...}']},
+  {id:3,  cat:'genomics', dif:'easy',   title:'Tamamlayıcı Zincir',         tags:['DNA','dict'],         desc:'A→T, T→A, G→C, C→G kurallarıyla tamamlayıcı DNA zincirini bulun.', hints:['eslesme = {"A":"T","T":"A","G":"C","C":"G"} sözlüğü oluştur.','eslesme["A"] → "T" döner.','Tüm diziyi çevirmek: "".join(eslesme[b] for b in dizi)','Ters zincir için: [::-1] ile tersine çevir.','return "".join(eslesme[b] for b in dizi)']},
+  {id:4,  cat:'genomics', dif:'easy',   title:'DNA → mRNA Transkripsiyon',  tags:['RNA','transkripsiyon'], desc:'Template DNA\'yı mRNA\'ya çevirin. DNA\'daki T bazı mRNA\'da U olur.', hints:['Template ipliğinde: A→U, T→A, G→C, C→G','eslesme = {"A":"U","T":"A","G":"C","C":"G"}','Her baz için: "".join(eslesme[b] for b in template)','Ya da önce tamamlayıcı al, sonra .replace("T","U")','return "".join(eslesme.get(b,"?") for b in template)']},
+  {id:5,  cat:'genomics', dif:'easy',   title:'DNA Palindromu Kontrolü',    tags:['DNA','palindrom'],    desc:'Tamamlayıcı zincirinin tersi orijinale eşitse palindromdur. GAATTC gibi.', hints:['Tamamlayıcı zinciri bul: {"A":"T","T":"A","G":"C","C":"G"}','Tersine çevir: comp_str[::-1]','Orijinal ile karşılaştır: dizi == ters_tamamlayici','GAATTC → tamamlayıcı CTTAAG → ters GAATTC ✓','return dizi == "".join({...}[b] for b in dizi)[::-1]']},
+  {id:6,  cat:'genomics', dif:'easy',   title:'ATG Kodon Arama',            tags:['DNA','ATG'],          desc:'DNA dizisinde ATG başlangıç kodonunun kaç kez geçtiğini ve pozisyonlarını bulun.', hints:['str.count("ATG") ile kaç tane olduğunu say.','Pozisyon için: [i for i in range(len(dizi)) if dizi[i:i+3]=="ATG"]','Döngü ile: i=0; while True: i = dizi.find("ATG",i); if i==-1: break','dizi.find("ATG") ilk ATG\'nin indeksini verir.','Liste döngüsü: [i for i in range(len(dizi)-2) if dizi[i:i+3]=="ATG"]']},
+  {id:7,  cat:'genomics', dif:'easy',   title:'Dizi Benzerliği',            tags:['DNA','karşılaştırma'], desc:'Aynı uzunluktaki iki DNA dizisini pozisyon pozisyon karşılaştırarak % benzerliği hesaplayın.', hints:['zip(d1,d2) ile iki diziyi eş zamanlı tara.','for b1,b2 in zip(d1,d2): if b1==b2: ...','Eşleşen sayısını topla, uzunluğa böl.','eslesen = sum(1 for a,b in zip(d1,d2) if a==b)','return eslesen/len(d1)*100']},
+  {id:8,  cat:'genomics', dif:'medium', title:'Kodon Tablosu & Translasyon', tags:['mRNA','protein'],    desc:'mRNA\'yı kodon tablosuna göre amino asit dizisine çevirin. AUG başlar, STOP kodonları bitirir.', hints:['range(0, len(mrna), 3) ile 3\'er adım at.','Her kodon: mrna[i:i+3]','KODON[kodon] ile amino asiti al.','if aa == "STOP": break ile dur.','protein listesine ekle, sonunda "-".join(protein)']},
+  {id:9,  cat:'genomics', dif:'medium', title:'Mutasyon Analizi',           tags:['mutasyon','SNP'],     desc:'İki DNA dizisi arasındaki farklı pozisyonları (mutasyon) bulun ve listeleyin.', hints:['enumerate(zip(d1,d2)) ile indeks ve bazları al.','for i,(b1,b2) in enumerate(zip(d1,d2))','b1 != b2 ise mutasyon var.','{"pos":i, "eski":b1, "yeni":b2} sözlüğü oluştur.','mutasyonlar.append(...) ile listeye ekle.']},
+  {id:10, cat:'genomics', dif:'medium', title:'ORF Bulma',                  tags:['ORF','ATG','STOP'],   desc:'DNA\'da ATG\'den dur kodonuna kadar uzanan tüm ORF\'leri bulun.', hints:['Her ATG pozisyonunu bul.','ATG\'den itibaren 3\'er adım at: for j in range(i,len(dna)-2,3)','dna[j:j+3] her kodon. DUR = {"TAA","TAG","TGA"}','Dur gelince ORF\'i kaydet ve dış döngüye dön.','{"baslangic":i,"bitis":j+3,"dizi":dna[i:j+3]}']},
+  {id:11, cat:'protein',  dif:'easy',   title:'Amino Asit Sayımı',          tags:['protein','Counter'],  desc:'Protein dizisindeki amino asitleri sayın, en sık 5\'ini büyükten küçüğe listeleyin.', hints:['Counter(protein) tüm karakterleri sayar.','from collections import Counter','c.most_common(5) ile en sık 5\'i alırsın.','Manuel: for aa in dizi: sayac[aa] = sayac.get(aa,0)+1','sorted(sayac.items(), key=lambda x:x[1], reverse=True)[:5]']},
+  {id:12, cat:'protein',  dif:'easy',   title:'Protein Özellikleri',        tags:['protein','temel'],    desc:'Uzunluk, ilk/son amino asit ve hiç bulunmayan amino asitleri bulun.', hints:['Uzunluk: len(protein)','İlk: protein[0], Son: protein[-1]','Tüm standart AA: "ACDEFGHIKLMNPQRSTVWY"','Eksik: set("ACDEFGHIKLMNPQRSTVWY") - set(protein)','set farkı: eksik = tum_set - mevcut_set']},
+  {id:13, cat:'protein',  dif:'easy',   title:'Yüklü Amino Asitler',        tags:['protein','yük'],      desc:'Pozitif (K,R,H) ve negatif (D,E) yüklü amino asitlerin sayısını ve yüzdesini bulun.', hints:['Pozitif: K,R,H → sum(1 for aa in dizi if aa in "KRH")','Negatif: D,E → sum(1 for aa in dizi if aa in "DE")','Yüzde: sayi/len(dizi)*100','Net yük: pozitif_sayi - negatif_sayi','return {"poz_sayi":..., "neg_sayi":..., "net_yuk":...}']},
+  {id:14, cat:'protein',  dif:'easy',   title:'Hidrofobik AA Analizi',      tags:['protein','yapı'],     desc:'Hidrofobik amino asitleri (A,V,I,L,M,F,W,P) sayın, yüzdesini ve pozisyonlarını bulun.', hints:['HIDROFOBIK = "AVILMFWP"','Sayma: sum(1 for aa in dizi if aa in HIDROFOBIK)','Pozisyonlar: [i for i,aa in enumerate(dizi) if aa in HIDROFOBIK]','Yüzde: sayi/len(dizi)*100','enumerate() indeks+değer verir: for i,aa in enumerate(dizi)']},
+  {id:15, cat:'protein',  dif:'easy',   title:'Protein Ters Çevirme',       tags:['protein','string'],   desc:'Protein dizisini tersine çevirin. N-terminal (baş) ve C-terminal (son) AA\'yi belirleyin.', hints:['Python\'da ters çevirme: dizi[::-1]','N-terminal: protein[0] (genellikle Met)','C-terminal: protein[-1]','list(reversed(dizi)) de aynı sonucu verir.','return {"ters":dizi[::-1], "n_terminal":dizi[0], "c_terminal":dizi[-1]}']},
+  {id:16, cat:'protein',  dif:'easy',   title:'Dipeptit Frekansı',          tags:['protein','pattern'],  desc:'Ardışık 2 amino asit çiftlerini (dipeptit) sayın, en sık 5\'ini bulun.', hints:['for i in range(len(protein)-1): dp = protein[i:i+2]','Counter ile say: Counter(protein[i:i+2] for i in range(len(protein)-1))','En sık: .most_common(5)','Dipeptit örn: "MG","GL","LK"','c = Counter(dizi[i:i+2] for i in range(len(dizi)-1)); return c.most_common(5)']},
+  {id:17, cat:'protein',  dif:'medium', title:'Moleküler Ağırlık',          tags:['protein','MW'],       desc:'Her amino asitin ağırlığını toplayın. Peptid bağlarında (n-1) × 18.02 Da su kaybedilir.', hints:['AA_W sözlüğünden her aa\'nın ağırlığını al.','Toplam: sum(AA_W[aa] for aa in dizi)','Su kaybı: (len(dizi)-1) * 18.02','MW = toplam - su_kaybi','return sum(AA_W[aa] for aa in dizi) - 18.02*(len(dizi)-1)']},
+  {id:18, cat:'protein',  dif:'medium', title:'FASTA Format Okuyucu',       tags:['FASTA','parsing'],    desc:'">" ile başlayan satırlar başlık, diğerleri dizidir. Birden fazla kayıt parse edin.', hints:['Satırlara böl: veri.strip().split("\\n")','Satır ">" ile başlıyorsa yeni kayıt.','Başlıktan ">" kaldır: satir[1:]','Dizi satırlarını birleştir: guncel_dizi += satir','Sonunda: kayitlar[baslik] = dizi']},
+  {id:19, cat:'protein',  dif:'medium', title:'İzoelektrik Nokta Tahmini',  tags:['protein','pI','pH'],  desc:'Asidik (D,E) ve bazik (K,R,H) AA sayısına bakarak tahmini pI değerini bulun.', hints:['Asidik > bazik → pI 4-6 arası','Bazik > asidik → pI 8-11 arası','Eşit → pI ~ 7','pKa değerleri: D=3.9, E=4.1, K=10.5, R=12.5, H=6.0','Basit formül: ort = (en_asidik_pKa + en_bazik_pKa) / 2']},
+  {id:20, cat:'tissue',   dif:'easy',   title:'Hücre Yoğunluğu',           tags:['hücre','hemositometre'], desc:'5 karenin sayımından ortalama alın, konsantrasyonu (hücre/mL) ve CV% hesaplayın.', hints:['Ortalama: sum(sayimlar)/len(sayimlar)','Konsantrasyon = ortalama × seyreltme × 10000','Std sapma için: math.sqrt(sum((x-ort)**2 for x in d)/(n-1))','CV% = (std/ort) * 100','CV < 15% kabul edilebilir, > 15% tekrar say.']},
+  {id:21, cat:'tissue',   dif:'easy',   title:'Pasaj Zamanı',              tags:['pasaj','konfluans'],   desc:'Günlük büyüme hızını hesaplayıp %80 konfluansa kaç günde ulaşıldığını bulun.', hints:['Günlük büyüme: (gun3 - gun1) / 2 (2 gün arayla ölçüm)','Kalan yol: hedef - baslangic','Gün sayısı: kalan / gunluk_buyume','math.ceil() ile yukarı yuvarla.','import math; return math.ceil((hedef-baslangic)/gunluk_buyume)']},
+  {id:22, cat:'tissue',   dif:'easy',   title:'İskele Porozitesi',         tags:['porozite','iskele'],   desc:'Porozite = (1 - görünür_yoğunluk / gerçek_yoğunluk) × 100 formülünü kullanın.', hints:['Formül: (1 - rho_gor/rho_ger) * 100','Silindir hacmi: math.pi * (cap/2)**2 * yukseklik','Kütle = görünür_yoğunluk × hacim','İyi iskele: %60-90 porozite','return (1 - rho_gor/rho_ger) * 100']},
+  {id:23, cat:'tissue',   dif:'easy',   title:'C1V1=C2V2 Seyreltme',       tags:['seyreltme','lab'],     desc:'Stok çözeltiden istenen konsantrasyonu hazırlamak için C1V1=C2V2 formülü.', hints:['C1V1 = C2V2','V1 = (C2 × V2) / C1','Eklenecek çözücü: V_cozucu = V2 - V1','Birimlere dikkat: hepsi aynı birimde olmalı.','return (C2*V2)/C1, V2-(C2*V2)/C1']},
+  {id:24, cat:'tissue',   dif:'easy',   title:'MTT Hücre Canlılığı',       tags:['MTT','canlılık'],      desc:'OD570 değerlerinden % hücre canlılığını hesaplayın: (OD_örnek / OD_kontrol) × 100', hints:['Önce kontrol ortalamasını bul: sum(veriler[0])/len(veriler[0])','Her konsantrasyon için: (ort_OD / kontrol_ort) * 100','Küçük konsantrasyonlarda canlılık yüksek, büyüklerde düşük.','IC50 = canlılığın %50 ye düştüğü nokta.','return {kons: sum(odlar)/len(odlar)/kontrol_ort*100 for kons,odlar in veriler.items()}']},
+  {id:25, cat:'tissue',   dif:'easy',   title:'Osmolarite Hesaplama',      tags:['osmolarite','hücre'],  desc:'Kültür ortamının osmolaritesini hesaplayın. Her bileşen için kons × iyon_sayısı toplayın.', hints:['NaCl → 2 iyon (Na+ ve Cl-)','Glukoz → iyonlaşmaz, 1 iyon sayısı','Osmolarite = Σ(kons_mM × iyon_sayısı)','Fizyolojik: 280-320 mOsm/L','for isim,(kons,iyon) in bilesimler.items(): toplam += kons*iyon']},
+  {id:26, cat:'tissue',   dif:'easy',   title:'Çift Katlanma Süresi',      tags:['doubling time','büyüme'], desc:'Td = t × ln(2) / ln(N/N0) formülüyle çift katlanma süresini hesaplayın.', hints:['import math kullan.','math.log() doğal logaritmadır.','math.log(2) ≈ 0.693','Td = t * math.log(2) / math.log(N/N0)','N/N0 = kaç kat çoğaldı']},
+  {id:27, cat:'tissue',   dif:'medium', title:'Lojistik Büyüme Modeli',    tags:['lojistik','model'],    desc:'N(t) = K / (1 + ((K-N0)/N0) × e^(-r×t)) formülüyle hücre büyümesini simüle edin.', hints:['import math; math.exp() kullan.','Paydaki ifade: (K-N0)/N0','Üstel kısım: math.exp(-r*t)','Tam: K / (1 + (K-N0)/N0 * math.exp(-r*t))','K = kapasite, N0 = başlangıç, r = hız']},
+  {id:28, cat:'tissue',   dif:'medium', title:'Difüzyon & Oksijen Akısı',  tags:['difüzyon','Fick'],     desc:'D_eff = D × porozite / τ² ve J = -D_eff × (ΔC/Δx) formüllerini kullanın.', hints:['D_eff = D_su * porozite / (tortuosity**2)','Konsantrasyon farkı: dC = C_yuzey - C_merkez','J = -D_eff * dC / dx','Negatif işaret: konsantrasyon azaldığı yönde akış.','abs(J) ile mutlak akış değeri']},
+  {id:29, cat:'tissue',   dif:'medium', title:'Reynolds Sayısı',           tags:['biyoreaktör','akış'],  desc:'Re = ρvD/μ ile akış tipini belirleyin. Re<2300 laminar, Re>4000 türbülanslı.', hints:['Re = rho * v * D / mu','rho: yoğunluk (kg/m³), v: hız (m/s), D: çap (m), mu: viskozite (Pa·s)','Re < 2300 → hücreler için güvenli (laminar)','Re > 4000 → hücre hasarı riski (türbülanslı)','return rho * v * D / mu']},
+  {id:30, cat:'stats',    dif:'easy',   title:'Ortalama ve Medyan',        tags:['istatistik','temel'],  desc:'Örneklem verisinden ortalama ve medyanı kütüphane kullanmadan hesaplayın.', hints:['Ortalama: sum(veri)/len(veri)','Medyan için önce sırala: sorted(veri)','Tek sayı → ortadaki eleman: sirali[n//2]','Çift sayı → ortadaki ikinin ortalaması: (sirali[n//2-1]+sirali[n//2])/2','n = len(veri); orta = n//2']},
+  {id:31, cat:'stats',    dif:'easy',   title:'Std Sapma & Varyans',       tags:['istatistik','std'],    desc:'Örneklem standart sapmasını Bessel düzeltmesiyle (n-1) hesaplayın.', hints:['Varyans = Σ(xi-ort)² / (n-1)  ← n-1 örneklem için','sapma_kare = sum((x-ort)**2 for x in veri)','Varyans = sapma_kare / (n-1)','Std = math.sqrt(varyans)','import math; return math.sqrt(sum((x-ort)**2 for x in veri)/(n-1))']},
+  {id:32, cat:'stats',    dif:'easy',   title:'Min, Max, IQR',             tags:['istatistik','çeyrek'],  desc:'Min, max, aralık ve çeyrekler arası aralığı (IQR = Q3 - Q1) hesaplayın.', hints:['min(veri), max(veri) kullanabilirsin.','Aralık (Range) = max - min','Sıralı verinin alt yarısının medyanı = Q1','Sıralı verinin üst yarısının medyanı = Q3','IQR = Q3 - Q1']},
+  {id:33, cat:'stats',    dif:'easy',   title:'Z-Score Hesaplama',         tags:['z-score','normalizasyon'], desc:'Her veri noktası için z = (x - ortalama) / std_sapma hesaplayın.', hints:['Önce ortalama ve std hesapla.','z = (x - ort) / std','|z| > 2 outlier kabul edilir.','Sonuç sözlüğü: {gen: (original, z)}','Z-score sonrası ortalama≈0, std≈1 olmalı (kontrol et!)']},
+  {id:34, cat:'stats',    dif:'easy',   title:'Pearson Korelasyonu',       tags:['korelasyon','Pearson'], desc:'İki gen serisi arasındaki Pearson r korelasyon katsayısını hesaplayın.', hints:['Kovaryans = Σ(xi-mx)(yi-my) / (n-1)','Pearson r = kovaryans / (std_x × std_y)','zip(x,y) ile iki listeyi eş zamanlı tara.','r=1 mükemmel pozitif, r=-1 mükemmel negatif, r=0 yok.','sum((xi-mx)*(yi-my) for xi,yi in zip(x,y))']},
+  {id:35, cat:'stats',    dif:'easy',   title:'Histogram Sınıflandırması', tags:['histogram','frekans'],  desc:'Veriyi bin\'lere ayırın, frekansları sayın, ASCII bar grafik çizin.', hints:['Bin genişliği: (max-min)/bin_sayisi','Her x hangi bin\'de: int((x-min_v)/genislik)','Frekansları bir listeye/dict\'e kaydet.','ASCII bar: "#" * frekans','range(bin_sayisi) ile binleri oluştur']},
+  {id:36, cat:'stats',    dif:'medium', title:'Welch T-Testi',             tags:['t-testi','hipotez'],    desc:'İki grubun ortalamasını Welch t-testi ile karşılaştırın. t = (x1-x2)/sqrt(s1²/n1+s2²/n2)', hints:['t = (ort1-ort2) / math.sqrt(s1**2/n1 + s2**2/n2)','Welch-Satterthwaite df formülü: paydaki kareler toplamı','Kritik t (df≈14, p<0.05) ≈ 2.145','abs(t) > t_kritik → anlamlı fark var.','s1**2/n1 + s2**2/n2 payda kısmıdır.']},
+  {id:37, cat:'stats',    dif:'medium', title:'Doğrusal Regresyon',        tags:['regresyon','trend'],    desc:'En küçük kareler ile y=mx+b regresyonu ve R² değerini hesaplayın.', hints:['Eğim: m = Σ(xi-mx)(yi-my) / Σ(xi-mx)²','Kesim: b = my - m*mx','R² = 1 - SS_res/SS_tot','SS_res=Σ(yi-y_hat)², SS_tot=Σ(yi-my)²','zip(x,y) ile çalış.']},
+  {id:38, cat:'stats',    dif:'medium', title:'Chi-Kare Testi',            tags:['chi-kare','Mendel'],    desc:'Mendel genetiği sonuçlarını chi-kare testiyle beklenen oranlarla karşılaştırın.', hints:['Beklenen = toplam × oran','χ² = Σ(O-E)²/E','df = kategori_sayısı - 1','p<0.05 için df=3 → kritik χ² = 7.815','for k in gozlenen: E=toplam*bek[k]; ki2 += (goz[k]-E)**2/E']},
+  {id:39, cat:'cell',     dif:'easy',   title:'Hücre Hacmi',               tags:['hücre','geometri'],    desc:'Küre: (4/3)πr³, Silindir/Disk: πr²h formülleriyle farklı hücre şekillerinin hacmini hesaplayın.', hints:['Küre: V = (4/3) * math.pi * r**3','Silindir: V = math.pi * r**2 * h','import math; math.pi kullan.','E.coli ≈ silindir, alyuvar ≈ disk','Birim: µm³ = femtolitre (fL)']},
+  {id:40, cat:'cell',     dif:'easy',   title:'Yüzey Alan / Hacim',        tags:['SA/V','difüzyon'],     desc:'SA/V oranı hücre beslenmesini belirler. Küre için SA=4πr², V=(4/3)πr³', hints:['SA = 4 * math.pi * r**2','V = (4/3) * math.pi * r**3','SA/V = SA/V — r büyüdükçe oran düşer!','Küçük hücreler → yüksek SA/V → iyi difüzyon','Teorik: SA/V = 3/r (küre için)']},
+  {id:41, cat:'cell',     dif:'easy',   title:'Mitoz Bölünme',             tags:['mitoz','üstel'],       desc:'Her bölünmede sayı 2 katına çıkar: N = N0 × 2^n, n = toplam_süre/Td', hints:['Her bölünmede 2 katı: N = N0 * 2**n','Bölünme sayısı: n = saat / Td','2**n veya pow(2,n) kullanabilirsin.','30 bölünme sonrası milyarlarca hücre olur.','int(N) ile tam sayıya çevir']},
+  {id:42, cat:'cell',     dif:'easy',   title:'Osmotik Basınç',            tags:['Van Hoff','osmotik'],  desc:'Van\'t Hoff: π = iCRT. T(K)=T(°C)+273.15, R=0.0821 L·atm/mol·K', hints:['π = i * C * R * T','i: iyon sayısı (NaCl→2, glukoz→1)','T Kelvin cinsinden: T_C + 273.15','R = 0.0821','Hücre içi ~7.7 atm, karşılaştır.']},
+  {id:43, cat:'cell',     dif:'medium', title:'Büyüme Eğrisi Analizi',     tags:['büyüme','OD600'],      desc:'µ = ln(OD2/OD1)/(t2-t1) ile özgül büyüme hızını hesaplayıp faz belirleyin.', hints:['math.log(OD2/OD1) doğal logaritma.','µ = math.log(OD2/OD1)/(t2-t1)','µ < 0.05 → lag/stasiyoner, µ > 0.3 → log fazı','OD1=0 ise sıfır bölme hatası olur, kontrol et!','for i in range(1, len(zaman)): mu = ...']},
+  {id:44, cat:'cell',     dif:'medium', title:'Apoptoz İndeksi',           tags:['apoptoz','flow cyt'],  desc:'Flow cytometry kadrantlarından canlılık ve apoptoz oranlarını hesaplayın.', hints:['Toplam = Q1+Q2+Q3+Q4','Canlı = Q4/toplam*100','Erken apoptoz = Q1/toplam*100','Geç apoptoz = Q2/toplam*100','Apoptoz indeksi = (Q1+Q2)/toplam*100']},
+  {id:45, cat:'cell',     dif:'medium', title:'Wound Healing Analizi',     tags:['yara','migrasyon'],    desc:'% Kapanma = (A0-At)/A0×100. Migrasyon hızını ve iki grup farkını hesaplayın.', hints:['A0 = genis[0] (başlangıç genişliği)','% kapanma = (A0-At)/A0*100 her zaman için','Migrasyon hızı = toplam_kapanma / toplam_süre','İki grubu karşılaştır: EGF vs kontrol','return [(A0-At)/A0*100 for At in genis]']}
+];
+
+// ── STARTER CODES ─────────────────────────────────────────────────────────
+var STARTERS = (function(){
+  var el = document.getElementById('starter-data');
+  try { return JSON.parse(el.textContent); } catch(e){ return {}; }
+})();
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+var state = {
+  current: null,
+  filter: 'all',
+  solved: JSON.parse(localStorage.getItem('bcl_solved')||'[]'),
+  xp: parseInt(localStorage.getItem('bcl_xp')||'0'),
+  hintIdx: {},
+  activeTab: 'out'
+};
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+window.onload = function(){
+  refreshXP();
+  renderList();
+  syncLines();
+  syncFreeLines();
+  document.getElementById('stat-solved').textContent = state.solved.length;
+  document.getElementById('stat-xp').textContent = state.xp;
+  // free editor default
+  document.getElementById('free-editor').value =
+    "# Serbest Python ortami\ndna = \"ATCGATCGATCG\"\ngc = (dna.count('G')+dna.count('C'))/len(dna)*100\nprint(\"GC Icerigi: \" + str(round(gc,1)) + \"%\")";
+  syncFreeLines();
+};
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+function showPage(p){
+  ['home','problems','ide','notes'].forEach(function(n){
+    document.getElementById('page-'+n).classList.toggle('active', n===p);
+    document.getElementById('nav-'+n).classList.toggle('active', n===p);
+  });
+}
+
+function filterAndGo(cat){
+  showPage('problems');
+  state.filter = cat;
+  document.querySelectorAll('.filter-tab').forEach(function(t){
+    var matches = (cat==='all' && t.textContent.trim()==='Tümü') ||
+                  t.onclick && t.getAttribute('onclick') && t.getAttribute('onclick').indexOf("'"+cat+"'")>-1;
+    t.classList.toggle('active', matches);
+  });
+  renderList();
+}
+
+function filterProblems(cat, btn){
+  state.filter = cat;
+  document.querySelectorAll('.filter-tab').forEach(function(t){ t.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  renderList();
+}
+
+// ── PROBLEM LIST ──────────────────────────────────────────────────────────
+function renderList(){
+  var list = document.getElementById('problem-list');
+  var items = state.filter==='all' ? PROBLEMS : PROBLEMS.filter(function(p){return p.cat===state.filter;});
+  list.innerHTML = items.map(function(p){
+    var solved = state.solved.indexOf(p.id)>-1;
+    var badge = solved
+      ? '<div class="solved-check">✓</div>'
+      : '<span class="'+(p.dif==='easy'?'diff-easy':'diff-medium')+'">'+(p.dif==='easy'?'Kolay':'Orta')+'</span>';
+    var tags = p.tags.map(function(t){return '<span class="tag">'+t+'</span>';}).join('');
+    var sel = state.current && state.current.id===p.id ? ' selected':'';
+    return '<div class="problem-item'+sel+'" onclick="selectProblem('+p.id+')">'
+      +'<div class="problem-item-header"><span class="problem-num">#'+String(p.id).padStart(2,'0')+'</span>'+badge+'</div>'
+      +'<div class="problem-title">'+p.title+'</div>'
+      +'<div class="problem-tags">'+tags+'</div></div>';
+  }).join('');
+}
+
+function selectProblem(id){
+  var p = null;
+  for(var i=0;i<PROBLEMS.length;i++){ if(PROBLEMS[i].id===id){p=PROBLEMS[i];break;} }
+  if(!p) return;
+  state.current = p;
+
+  var xpVal = p.dif==='easy'?30:80;
+  var diffLabel = p.dif==='easy'?'Kolay':'Orta';
+  var diffClass = p.dif==='easy'?'diff-easy':'diff-medium';
+
+  document.getElementById('problem-header').innerHTML =
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap">'
+    +'<h2>'+p.title+'</h2>'
+    +'<span class="'+diffClass+'">'+diffLabel+'</span>'
+    +'<span style="font-size:.75rem;color:var(--warn);background:rgba(245,158,11,.1);padding:2px 9px;border-radius:8px">+'+xpVal+' XP</span>'
+    +'</div><p class="problem-desc">'+p.desc+'</p>';
+
+  var starter = STARTERS[String(id)] || '# Kod buraya...';
+  document.getElementById('code-editor').value = starter;
+  syncLines();
+
+  document.getElementById('out').innerHTML = '<div class="placeholder"><div class="icon">▶</div><p><strong>Çalıştır</strong> butonuna tıklayın</p></div>';
+  document.getElementById('hints').innerHTML = '<div class="placeholder"><div class="icon">💡</div><p>İlk ipucu için <strong>İpucu</strong> butonuna basın</p></div>';
+  document.getElementById('fb').innerHTML = '<div class="placeholder"><div class="icon">🤖</div><p>Kodu çalıştırdıktan sonra görünür</p></div>';
+
+  document.getElementById('hint-btn').disabled = false;
+  document.getElementById('explain-btn').disabled = false;
+
+  showTab('out', document.querySelector('.output-tab'));
+  renderList();
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────
+function showTab(name, btn){
+  state.activeTab = name;
+  ['out','hints','fb'].forEach(function(t){
+    var el = document.getElementById(t);
+    if(el) el.classList.toggle('visible', t===name);
+  });
+  document.querySelectorAll('#page-problems .output-tab').forEach(function(t){ t.classList.remove('active'); });
+  if(btn) btn.classList.add('active');
+  else {
+    var idx = {out:0,hints:1,fb:2}[name];
+    var tabs = document.querySelectorAll('#page-problems .output-tab');
+    if(tabs[idx]) tabs[idx].classList.add('active');
+  }
+}
+
+// ── INFINITE HINTS ────────────────────────────────────────────────────────
+function getHint(){
+  if(!state.current) return;
+  var p = state.current;
+  var pid = p.id;
+  if(!state.hintIdx[pid]) state.hintIdx[pid]=0;
+
+  var btn = document.getElementById('hint-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳';
+
+  showTab('hints', null);
+
+  var area = document.getElementById('hints');
+  var ph = area.querySelector('.placeholder');
+  if(ph) ph.remove();
+
+  var idx = state.hintIdx[pid];
+  var staticHints = p.hints || [];
+
+  if(idx < staticHints.length){
+    setTimeout(function(){
+      addHintBox(area, idx+1, staticHints[idx], '');
+      state.hintIdx[pid]++;
+      btn.disabled = false;
+      btn.textContent = '💡 İpucu';
+    }, 300);
+  } else {
+    // AI hint
+    var prompt = 'Sen Python biyoinformatik ogretmenisin. Turkce yanit ver.\n\nProblem: "'+p.title+'"\nAciklama: '+p.desc+'\nSu ana kadar '+idx+' ipucu verildi. Bu '+(idx+1)+'. ipucudur. Giderek daha acik ol ama cevabi verme.\n\nIPUCU: [1-2 cumle ipucu]\nKOD: [varsa kisa Python satiri, yoksa bos]';
+    callAI(prompt, 300, function(text){
+      var m1 = text.match(/IPUCU:\s*(.+?)(?=KOD:|$)/s);
+      var m2 = text.match(/KOD:\s*(.+?)$/s);
+      var ipucu = m1 ? m1[1].trim() : text.trim();
+      var kod = m2 ? m2[1].trim() : '';
+      addHintBox(area, idx+1, ipucu, kod);
+      state.hintIdx[pid]++;
+      btn.disabled = false;
+      btn.textContent = '💡 İpucu';
+    }, function(){
+      addHintBox(area, idx+1, 'Tüm ipuçlarını kullandın! Kodu satır satır takip et, print() ile ara değerleri kontrol et.', '');
+      btn.disabled = false;
+      btn.textContent = '💡 İpucu';
+    });
+  }
+}
+
+function addHintBox(area, num, text, code){
+  var div = document.createElement('div');
+  div.className = 'hint-box';
+  div.innerHTML = '<div class="hint-num">İpucu #'+num+'</div>'
+    +'<div class="hint-text">'+esc(text)+'</div>'
+    +(code ? '<div class="hint-code">'+esc(code)+'</div>' : '');
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  setTimeout(function(){ div.classList.add('show'); }, 20);
+}
+
+// ── EXPLAIN (ANLATMA) ─────────────────────────────────────────────────────
+function openExplain(){
+  if(!state.current) return;
+  var modal = document.getElementById('explain-modal');
+  modal.classList.add('open');
+  var body = document.getElementById('modal-body');
+  body.innerHTML = '<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><span>Kitap anlatımı hazırlanıyor...</span></div>';
+
+  var p = state.current;
+  var prompt = 'Sen biyoinformatik Python hoca ve kitap yazarisin. Turkce, cok ogretici ve renkli yaz.\n'
+    +'Problem: "'+p.title+'"\nAciklama: '+p.desc+'\n\n'
+    +'Bu problemi SADECE asagidaki JSON formatinda dondur, baska hicbir sey yazma:\n'
+    +'{\n'
+    +'  "baslik": "Problem basligi",\n'
+    +'  "bolumler": [\n'
+    +'    {\n'
+    +'      "tip": "bio",\n'
+    +'      "baslik": "Biyolojik Arka Plan",\n'
+    +'      "metin": "Bu hesaplama biyolojide neden onemli? Hangi durumlarda kullanilir? **kalin** sozcuklerle vurgula.",\n'
+    +'      "ipucu": "Aklinda tut: kisa bir hatirlatici"\n'
+    +'    },\n'
+    +'    {\n'
+    +'      "tip": "py",\n'
+    +'      "baslik": "Python ile Nasil Dusunelim?",\n'
+    +'      "metin": "Problemi adim adim Python mantigi ile anlat. **str.count()** gibi yontemleri vurgula.",\n'
+    +'      "ipucu": ""\n'
+    +'    },\n'
+    +'    {\n'
+    +'      "tip": "step",\n'
+    +'      "baslik": "Adim Adim Cozum",\n'
+    +'      "metin": "Her adimi kisa cumleyle anlat.",\n'
+    +'      "satirlar": [\n'
+    +'        {"kod": "gc = (dna.count(\'G\') + dna.count(\'C\'))", "aciklama": "G ve C bazlarini say, topla"},\n'
+    +'        {"kod": "toplam = len(dna)", "aciklama": "Toplam baz sayisini al"},\n'
+    +'        {"kod": "yuzde = gc / toplam * 100", "aciklama": "Yuzde hesapla"}\n'
+    +'      ]\n'
+    +'    },\n'
+    +'    {\n'
+    +'      "tip": "real",\n'
+    +'      "baslik": "Gercek Hayatta Kullanimi",\n'
+    +'      "metin": "Bu hesaplama laboratuvarda veya arastirmada nerede karsilasiliyor?",\n'
+    +'      "ipucu": ""\n'
+    +'    },\n'
+    +'    {\n'
+    +'      "tip": "warn",\n'
+    +'      "baslik": "Dikkat: Sik Yapilan Hatalar",\n'
+    +'      "metin": "Ogrencilerin en cok nerede hata yaptigini anlat.",\n'
+    +'      "uyari": "En onemli hata: kisa bir uyari"\n'
+    +'    }\n'
+    +'  ]\n'
+    +'}\n'
+    +'satirlar dizisi sadece "step" tipinde olsun. Diger tiplerde satirlar alanina gerek yok.';
+
+  callAI(prompt, 2000, function(text){
+    var parsed;
+    try { parsed = JSON.parse(text.replace(/```json|```/g,'').trim()); }
+    catch(e){
+      parsed = {baslik:p.title, bolumler:[{tip:'bio',baslik:'Anlatım',metin:text,ipucu:''}]};
+    }
+    renderExplain(parsed);
+  }, function(){
+    document.getElementById('modal-body').innerHTML = '<div style="color:var(--danger);padding:20px">Bağlantı hatası.</div>';
+  });
+}
+
+function renderExplain(data){
+  var tipCfg = {
+    bio:  {badge:'badge-bio',  tag:'tag-bio',  label:'🧬 BİYOLOJİ', icon:'🧬'},
+    py:   {badge:'badge-py',   tag:'tag-py',   label:'🐍 PYTHON',   icon:'🐍'},
+    step: {badge:'badge-step', tag:'tag-step', label:'📋 ADIMLAR',  icon:'📋'},
+    real: {badge:'badge-real', tag:'tag-real', label:'🔬 UYGULAMA', icon:'🔬'},
+    warn: {badge:'badge-warn', tag:'tag-warn', label:'⚠️ DİKKAT',   icon:'⚠️'}
+  };
+
+  var html = '';
+  (data.bolumler||[]).forEach(function(b, idx){
+    var cfg = tipCfg[b.tip] || tipCfg.bio;
+    var metin = esc(b.metin||'')
+      .replace(/\*\*(.+?)\*\*/g, '<strong class="book-hl">$1</strong>')
+      .replace(/`(.+?)`/g, '<span style="font-family:\'JetBrains Mono\',monospace;font-size:.84rem;color:#c4b5fd;background:rgba(167,139,250,.1);padding:1px 6px;border-radius:4px">$1</span>')
+      .replace(/\n/g,'<br>');
+
+    html += '<div class="book-section" style="animation-delay:'+(idx*0.08)+'s">';
+    html += '<div class="book-card">';
+    // card header
+    html += '<div class="book-card-head">'
+      +'<div class="chapter-badge '+cfg.badge+'">'+cfg.icon+'</div>'
+      +'<div class="chapter-title">'+esc(b.baslik||'')+'</div>'
+      +'<span class="chapter-tag '+cfg.tag+'">'+cfg.label+'</span>'
+      +'</div>';
+    // card body
+    html += '<div class="book-card-body">';
+    if(b.metin) html += '<div class="book-text">'+metin+'</div>';
+
+    // Line-by-line code (step)
+    if(b.satirlar && b.satirlar.length){
+      html += '<div class="code-explain">'
+        +'<div class="code-explain-header">'
+        +'<div class="code-dot code-dot-r"></div><div class="code-dot code-dot-y"></div><div class="code-dot code-dot-g"></div>'
+        +'<span class="code-explain-title">— satıra tıkla: açıklama görün</span>'
+        +'</div>'
+        +'<div class="code-line-wrap">';
+      b.satirlar.forEach(function(s, li){
+        var hasNote = s.aciklama && s.aciklama.trim();
+        html += '<div class="code-line'+(hasNote?' has-note':'')+'" '
+          +(hasNote ? 'onclick="toggleCodeLine(this)"' : '')+'>'
+          +'<span class="code-ln">'+(li+1)+'</span>'
+          +'<span class="code-src">'+highlightPy(s.kod||'')+'</span>'
+          +'</div>';
+        if(hasNote){
+          html += '<div class="code-note-bubble">💬 '+esc(s.aciklama)+'</div>';
+        }
+      });
+      html += '</div></div>';
+    }
+
+    // tip box
+    if(b.ipucu && b.ipucu.trim()){
+      html += '<div class="book-tip-box"><div class="tip-icon">💡</div><div class="tip-text">'+esc(b.ipucu)+'</div></div>';
+    }
+    // warn box
+    if(b.uyari && b.uyari.trim()){
+      html += '<div class="book-warn-box"><div class="tip-icon">⚠️</div><div class="warn-text">'+esc(b.uyari)+'</div></div>';
+    }
+    html += '</div></div></div>';
+  });
+
+  document.getElementById('modal-body').innerHTML = html;
+}
+
+function toggleCodeLine(el){
+  var wasOpen = el.classList.contains('open');
+  // close all others
+  document.querySelectorAll('.code-line.open').forEach(function(e){ e.classList.remove('open'); });
+  if(!wasOpen) el.classList.add('open');
+}
+
+function highlightPy(code){
+  var s = esc(code);
+  // keywords
+  s = s.replace(/\b(def|return|if|else|elif|for|while|in|not|and|or|True|False|None|import|from|class|pass|break|continue|try|except|raise)\b/g,'<span class="kw">$1</span>');
+  // builtin functions
+  s = s.replace(/\b(print|len|range|sum|int|str|float|list|dict|set|sorted|enumerate|zip|round|abs|min|max|math)\b(?=\()/g,'<span class="fn">$1</span>');
+  // strings
+  s = s.replace(/(&#39;[^&#39;]*&#39;|&quot;[^&quot;]*&quot;)/g,'<span class="st">$1</span>');
+  // comments
+  s = s.replace(/(#.*$)/gm,'<span class="cm">$1</span>');
+  // numbers
+  s = s.replace(/\b(\d+\.?\d*)\b/g,'<span class="nm">$1</span>');
+  return s;
+}
+
+function closeExplain(){
+  document.getElementById('explain-modal').classList.remove('open');
+}
+
+function bgClose(e){
+  if(e.target===document.getElementById('explain-modal')) closeExplain();
+}
+
+// ── CODE RUNNER ───────────────────────────────────────────────────────────
+var skulptReady = false;
+
+function loadSkulpt(cb){
+  if(skulptReady){ cb(); return; }
+  var s1 = document.createElement('script');
+  s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js';
+  s1.onload = function(){
+    var s2 = document.createElement('script');
+    s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js';
+    s2.onload = function(){ skulptReady=true; cb(); };
+    document.head.appendChild(s2);
+  };
+  document.head.appendChild(s1);
+}
+
+function runCode(){
+  if(!state.current){ toast('Önce bir problem seçin','err'); return; }
+  var code = document.getElementById('code-editor').value;
+  var btn = document.getElementById('run-btn');
+  var spinner = document.getElementById('run-spinner');
+  var txt = document.getElementById('run-text');
+  btn.disabled=true; spinner.style.display='block'; txt.textContent='Çalışıyor...';
+
+  showTab('out',null);
+  document.getElementById('out').innerHTML = '<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><span>Python çalıştırılıyor...</span></div>';
+
+  loadSkulpt(function(){
+    execPython(code, function(result){
+      showOutput(result, document.getElementById('out'));
+      getAIFeedback(code, result);
+      btn.disabled=false; spinner.style.display='none'; txt.textContent='▶ Çalıştır';
+    });
+  });
+}
+
+function execPython(code, cb){
+  var out='';
+  Sk.configure({
+    output: function(t){ out+=t; },
+    read: function(x){
+      if(!Sk.builtinFiles||!Sk.builtinFiles.files[x]) throw "File not found: '"+x+"'";
+      return Sk.builtinFiles.files[x];
+    },
+    execLimit: 5000
+  });
+  Sk.misceval.asyncToPromise(function(){
+    return Sk.importMainWithBody('<stdin>',false,code,true);
+  }).then(
+    function(){ cb({ok:true, out:out.trim(), err:''}); },
+    function(e){ cb({ok:false, out:out.trim(), err:friendlyErr(e.toString())}); }
+  );
+}
+
+function friendlyErr(msg){
+  if(msg.indexOf('NameError')>-1){
+    var m=msg.match(/name '(.+?)' is not defined/);
+    return '❌ Tanımsız Değişken\n\n"'+(m?m[1]:'?')+'" tanımlanmamış.\n\n💡 Değişkeni kullanmadan önce tanımla. Yazım hatası var mı?';
+  }
+  if(msg.indexOf('SyntaxError')>-1){
+    var ln=msg.match(/on line (\d+)/);
+    return '❌ Sözdizimi Hatası'+(ln?' (Satır '+ln[1]+')':'')+'\n\n💡 Parantez kapatıldı mı? ":" eksik mi? Girinti doğru mu?';
+  }
+  if(msg.indexOf('IndentationError')>-1) return '❌ Girinti Hatası\n\nif/for/def bloklarının içi 4 boşluk girintili olmalı.\n\n💡 Tab ve boşluk karıştırma!';
+  if(msg.indexOf('TypeError')>-1) return '❌ Tip Hatası\n\n'+msg+'\n\n💡 Yanlış veri tipiyle işlem yapıldı. int(), str(), float() kontrolü yap.';
+  if(msg.indexOf('ZeroDivisionError')>-1) return '❌ Sıfıra Bölme\n\nBölen değer sıfır.\n\n💡 if n != 0: kontrolü ekle.';
+  if(msg.indexOf('IndexError')>-1) return '❌ İndeks Hatası\n\nListe sınırları dışına çıkıldı.\n\n💡 len() ile uzunluğu kontrol et.';
+  if(msg.indexOf('KeyError')>-1){
+    var k=msg.match(/KeyError: (.+)/);
+    return '❌ Anahtar Bulunamadı\n\n'+(k?k[1]:'?')+' sözlükte yok.\n\n💡 dict.get(anahtar, varsayilan) kullan.';
+  }
+  if(msg.indexOf('execLimit')>-1) return '⏱️ Zaman Aşımı\n\nKod 5 saniyede bitmedi.\n\n💡 Sonsuz döngü var mı?';
+  return '❌ Hata\n'+msg;
+}
+
+function showOutput(r, area){
+  var html='';
+  if(r.out) html+='<div class="out-block ok">'+esc(r.out)+'</div>';
+  if(r.err) html+='<div class="out-block err">'+esc(r.err)+'</div>';
+  if(!r.out&&!r.err) html='<div class="out-block info">Çıktı üretilmedi.\n💡 print() kullandın mı?</div>';
+  area.innerHTML=html;
+}
+
+// ── AI FEEDBACK ───────────────────────────────────────────────────────────
+function getAIFeedback(code, result){
+  var p = state.current;
+  var fbArea = document.getElementById('fb');
+  fbArea.innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><span>BioCode AI analiz ediyor...</span></div>';
+
+  var prompt='Sen biyoinformatik Python egitmensin. Turkce yanit ver.\nProblem: "'+p.title+'" ('+p.dif+')\n'+p.desc+'\nOgrenci kodu:\n```python\n'+code+'\n```\nCalisme: '+(result.ok?'BASARILI':'HATA')+'\n'+(result.out?'Cikti: '+result.out:'')+(result.err?'\nHata: '+result.err:'')+'\n\nSadece JSON dondur:\n{"puan":85,"durum":"...","deger":"...","gelistir":"...","oneriler":["...","..."],"biyobaglamti":"..."}';
+
+  callAI(prompt, 800, function(text){
+    var fb;
+    try{ fb=JSON.parse(text.replace(/```json|```/g,'').trim()); }
+    catch(e){ fb={puan:result.ok?70:25,durum:result.ok?'Güzel!':'Hata var',deger:'Devam et!',gelistir:'Hatayı incele.',oneriler:['print() ile test et'],biyobaglamti:'Bu hesaplama biyolojide önemli.'}; }
+    renderFeedback(fb);
+    if(result.ok && fb.puan>=55 && state.solved.indexOf(p.id)===-1){
+      var earned = p.dif==='easy'?30:80;
+      state.xp+=earned;
+      state.solved.push(p.id);
+      localStorage.setItem('bcl_xp',state.xp);
+      localStorage.setItem('bcl_solved',JSON.stringify(state.solved));
+      refreshXP();
+      document.getElementById('stat-solved').textContent=state.solved.length;
+      document.getElementById('stat-xp').textContent=state.xp;
+      toast('🎉 +'+earned+' XP kazandın!','ok');
+      renderList();
+      addNote(p,fb);
+    }
+  }, function(){
+    fbArea.innerHTML='<div class="out-block err">AI bağlantısı yok. İnternet bağlantınızı kontrol edin.</div>';
+  });
+}
+
+function renderFeedback(fb){
+  var area=document.getElementById('fb');
+  var sc=fb.puan>=80?'sc-a':fb.puan>=55?'sc-b':'sc-c';
+  var em=fb.puan>=80?'🏆':fb.puan>=55?'✅':'❌';
+  var html='<div class="ai-fb"><div class="ai-fb-header"><div class="ai-avatar">🤖</div><div><div class="ai-name">BioCode AI</div><div style="font-size:.72rem;color:var(--text-dim)">'+esc(fb.durum)+'</div></div></div>'
+    +'<div class="score-row"><div class="score-chip '+sc+'"><div class="score-val">'+fb.puan+'</div><div style="color:var(--text-mid);font-size:.73rem">/ 100</div></div>'
+    +'<div class="score-chip"><div class="score-val">'+em+'</div></div></div>'
+    +'<div class="pbar-wrap"><div class="pbar-fill" style="width:'+fb.puan+'%"></div></div></div>';
+  if(fb.deger) html+='<div class="ai-fb"><div style="font-size:.73rem;color:var(--accent);font-weight:700;margin-bottom:6px">✨ GÜÇLÜ YÖNLER</div><div class="ai-text">'+esc(fb.deger)+'</div></div>';
+  if(fb.gelistir) html+='<div class="ai-fb"><div style="font-size:.73rem;color:var(--warn);font-weight:700;margin-bottom:6px">🔧 GELİŞTİR</div><div class="ai-text">'+esc(fb.gelistir)+'</div></div>';
+  if(fb.oneriler&&fb.oneriler.length) html+='<div class="ai-fb"><div style="font-size:.73rem;color:var(--accent2);font-weight:700;margin-bottom:6px">💡 ÖNERİLER</div><ul class="sug-list">'+fb.oneriler.map(function(o){return '<li>'+esc(o)+'</li>';}).join('')+'</ul></div>';
+  if(fb.biyobaglamti) html+='<div class="ai-fb"><div style="font-size:.73rem;color:var(--accent3);font-weight:700;margin-bottom:6px">🧬 BİYOLOJİK BAĞLAM</div><div class="ai-text">'+esc(fb.biyobaglamti)+'</div></div>';
+  area.innerHTML=html;
+  showTab('fb',null);
+}
+
+function addNote(p,fb){
+  var em={genomics:'🧬',protein:'🔬',tissue:'🫀',stats:'📊',cell:'🦠'}[p.cat]||'📝';
+  var date=new Date().toLocaleDateString('tr-TR');
+  var el=document.createElement('div');
+  el.className='note-card';
+  el.innerHTML='<div class="note-card-top"><div class="note-icon">'+em+'</div><div class="note-date">'+date+'</div></div>'
+    +'<div class="note-title">'+esc(p.title)+'</div>'
+    +'<div class="note-text">'+esc((fb.biyobaglamti||fb.deger||'').substring(0,100))+'...</div>'
+    +'<div style="margin-top:7px;font-size:.7rem;color:var(--accent)">+'+fb.puan+'/100 ✓</div>';
+  var grid=document.getElementById('notes-grid');
+  grid.insertBefore(el,grid.firstChild);
+}
+
+// ── FREE IDE ──────────────────────────────────────────────────────────────
+function runFree(){
+  var code=document.getElementById('free-editor').value;
+  var area=document.getElementById('free-out');
+  area.innerHTML='<div class="thinking"><div class="dots"><span></span><span></span><span></span></div><span>Çalıştırılıyor...</span></div>';
+  loadSkulpt(function(){
+    execPython(code, function(r){ showOutput(r,area); });
+  });
+}
+
+// ── LINE NUMBERS ──────────────────────────────────────────────────────────
+function syncLines(){
+  var ta=document.getElementById('code-editor');
+  var ln=document.getElementById('line-numbers');
+  if(!ta||!ln) return;
+  var n=ta.value.split('\n').length;
+  var html='';
+  for(var i=1;i<=n;i++) html+='<span class="line-num">'+i+'</span>';
+  ln.innerHTML=html;
+  ln.scrollTop=ta.scrollTop;
+}
+
+function syncScroll(){
+  var ta=document.getElementById('code-editor');
+  var ln=document.getElementById('line-numbers');
+  if(ta&&ln) ln.scrollTop=ta.scrollTop;
+}
+
+function syncFreeLines(){
+  var ta=document.getElementById('free-editor');
+  var ln=document.getElementById('free-ln');
+  if(!ta||!ln) return;
+  var n=ta.value.split('\n').length;
+  var html='';
+  for(var i=1;i<=n;i++) html+='<span class="line-num">'+i+'</span>';
+  ln.innerHTML=html;
+  ln.scrollTop=ta.scrollTop;
+}
+
+function syncFreeScroll(){
+  var ta=document.getElementById('free-editor');
+  var ln=document.getElementById('free-ln');
+  if(ta&&ln) ln.scrollTop=ta.scrollTop;
+}
+
+function handleTab(e){
+  if(e.key==='Tab'){
+    e.preventDefault();
+    var ta=e.target;
+    var s=ta.selectionStart;
+    ta.value=ta.value.substring(0,s)+'    '+ta.value.substring(ta.selectionEnd);
+    ta.selectionStart=ta.selectionEnd=s+4;
+    syncLines(); syncFreeLines();
+  }
+}
+
+// ── AI HELPER ─────────────────────────────────────────────────────────────
+function callAI(prompt, maxTokens, onSuccess, onError){
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:maxTokens,
+      messages:[{role:'user',content:prompt}]
+    })
+  }).then(function(r){ return r.json(); })
+    .then(function(d){
+      var text=(d.content||[]).map(function(c){return c.text||'';}).join('');
+      onSuccess(text);
+    })
+    .catch(function(e){ if(onError) onError(e); });
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────
+function refreshXP(){
+  document.getElementById('xp-display').textContent=state.xp+' XP';
+}
+
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='toast '+type+' show';
+  setTimeout(function(){ t.classList.remove('show'); },3200);
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
